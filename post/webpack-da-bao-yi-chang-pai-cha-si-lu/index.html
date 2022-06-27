@@ -1,0 +1,755 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Webpack打包异常排查思路 | PbRcord</title>
+
+<link rel="shortcut icon" href="https://a1733452028.github.io/favicon.ico?v=1656295333320">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://a1733452028.github.io/styles/main.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+
+<style>
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            PbRcord
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1656295333320"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = () => {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Webpack打包异常排查思路
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2022-05-09 ·
+                    </time>
+                    
+                        <a href="https://a1733452028.github.io/tag/CPSh7zlHy/" class="post-tags">
+                            # webpack
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h2 id="一-问题描述">一、问题描述</h2>
+<p>考勤系统在访问某个页面时出现异常的问题 <a href="https://devkq.gz4399.com/overview/yuzhu/worktime">复现地址</a></p>
+<h2 id="二-具体分析">二、具体分析</h2>
+<p>异常页面出现以下的内容：Uncaught (in promise) TypeError: Super expression must either be null or a function</p>
+<p>出现以上错误后，我在google上搜索得出的结果大部分都是说我的编写React时语法出现问题。<a href="https://www.google.com/search?q=Super+expression+must+either+be+null+or+a+function&amp;oq=Super+expression+must+either+be+null+or+a+function&amp;aqs=chrome.0.69i59j0i512l5j69i60l2.299j0j7&amp;sourceid=chrome&amp;ie=UTF-8">google搜索结果</a></p>
+<p>不过，这个结论很快就被我否决掉。因为本地开发的时候，这个页面是可以正常运行的。</p>
+<h2 id="三-排查思路">三、排查思路</h2>
+<p>通过具体分析中，我归纳总结出了大概解决思路：</p>
+<ol>
+<li>
+<p>首先webpack development模式(开发模式)上是不存在任何问题，出现问题是在 production (生产模式)</p>
+</li>
+<li>
+<p>异常报错 指出我React 语法有问题,  并且报错的文件指向是Js类型的文件。</p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20220509_1652063755567828000-20220509135259010.png" alt="image-20220509103553924" loading="lazy"></figure>
+</li>
+</ol>
+<h2 id="四-尝试解决问题">四、尝试解决问题</h2>
+<p>有了大概思路，就需要实践一波了。</p>
+<p>首先，查看webpack配置文件(这个项目比较特殊，webpack配置文件只存在一份文件)</p>
+<p><code>webapck.config.js</code></p>
+<pre><code class="language-javascript">const path = require('path');
+const fs = require('fs');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const merge = require('webpack-merge');
+const TerserJSPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+
+const lessToJs =require('less-vars-to-js');
+const paletteLess = fs.readFileSync('src/styles/variables.less', 'utf8');
+const lessVars = lessToJs(paletteLess, {resolveVariables: true, stripPrefix: true});
+if(lessVars['font-family']){
+  lessVars['font-family'] = `&quot;${lessVars['font-family']}&quot;`
+}
+const aliyunTheme = require('../node_modules/@ant-design/aliyun-theme').default;
+
+module.exports = (env) =&gt; {
+  const isDev = env.mode === 'development';
+  let config;
+
+  const base = {
+    mode: isDev ? 'development' : 'production',
+    devtool: 'inline-source-map',
+    context: path.resolve(__dirname, '../'),
+    // 入口这里reat-hot-loader官文说要加上reat-hot-loader、patch，以及下面的react-babel-loader/babel，实测加上会导致开发模式下radiobutton异常，去掉并不影响热加载和浏览器自动刷新，所以不要加了。
+    entry: ['@babel/polyfill', './src/index.js'],
+    output: {
+      path: path.resolve(__dirname, '../dist'),
+      pathinfo: isDev,
+      filename: isDev ? '[name].js' : '[name].[hash:8].js',
+      publicPath: '/',
+      chunkFilename: isDev ? '[name].chunk.js' : '[name].[hash:8].chunk.js',
+      hotUpdateMainFilename: '[hash].hot-update.json',
+    },
+    module: {
+      rules: [
+        // {
+        //   enforce: 'pre',
+        //   test: /\.js$|\.jsx$/,
+        //   loader: 'eslint-loader',
+        //   include: [path.resolve(__dirname, '../src')],
+        //   exclude: [path.resolve(__dirname, '../src/views/components/term_record')],
+        // },
+        {
+          test: /\.(js|jsx)$/,
+          include: [path.resolve(__dirname, '../src')],
+          exclude: [path.resolve(__dirname, '../node_modules')],
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  ['@babel/preset-env', {
+                    useBuiltIns: false,
+                  }],
+                  '@babel/preset-react',
+                ],
+                plugins: [
+                  // &quot;@babel/plugin-transform-runtime&quot;,
+                  '@babel/plugin-syntax-dynamic-import',
+                  ['@babel/plugin-proposal-decorators', { legacy: true }],
+                  ['@babel/plugin-proposal-class-properties', { loose: true }],
+                  '@babel/plugin-proposal-export-default-from',
+                  '@babel/plugin-transform-reserved-words',
+                  'inline-react-svg',
+                  ['import', { libraryName: 'antd', style: true }, 'antd'],
+                  ['import', { libraryName: 'ant-design-pro', libraryDirectory: 'lib', style: true, camel2DashComponentName: false}, 'ant-design-pro']
+                ],
+                // This is a feature of `babel-loader` for webpack (not Babel itself).
+                // It enables caching results in ./node_modules/.cache/babel-loader/
+                // directory for faster rebuilds.
+                cacheDirectory: true,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.css$/,
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ],
+        },
+        // 解析未启用css-modules的less文件
+        {
+          test: /\.less$/,
+          include: [/[\\/]node_modules[\\/].*antd/],
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+            {
+              loader: 'less-loader',
+              options: {
+                sourceMap: true,
+                modifyVars: {
+                  ...aliyunTheme,
+                  ...lessVars,
+                  '@icon-url': '&quot;../../../../../public/fonts/anticon/font_r5u29ls31bgldi&quot;',
+                },
+                javascriptEnabled: true,
+              },
+            },
+          ],
+        },
+        // 解析启用css-modules的less文件
+        {
+          test: /\.less$/,
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: '[name]__[local]',
+                importLoaders: 2,
+              },
+            }, {
+              loader: 'less-loader',
+              options: {
+                javascriptEnabled: true,
+                modifyVars: {
+                  ...aliyunTheme,
+                  ...lessVars,
+                },
+              },
+            },
+          ],
+          include: [path.resolve(__dirname, '../src')],
+          exclude: [path.resolve(__dirname, '../node_modules')],
+        },
+        // 处理anticon图标字体文件
+        {
+          resource: path.resolve(__dirname, '../public/fonts/anticon'),
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                name: 'assets/anticon/[name].[ext]'
+              }
+            }
+          ],
+        },
+        {
+          test: /\.(png|jpg|gif)$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]',
+                outputPath: 'images/',
+                // publicPath: 'images/',
+              },
+            },
+          ],
+        },
+        {
+          test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+            },
+            {
+              loader: '@svgr/webpack',
+              options: {
+                babel: false,
+                icon: true,
+              },
+            },
+          ],
+        }
+      ],
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        title: '蓝海系统',
+        template: path.join(__dirname, '../src/index.html'),
+        filename: 'index.html',
+        inject: 'body',
+        htmlContent: '&lt;%- __html__ %&gt;',
+        initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+        hash: true,    // 为静态资源生成hash值
+        minify: {    // 压缩HTML文件
+          removeComments: false,    // 移除HTML中的注释
+          collapseWhitespace: false,    // 删除空白符与换行符
+        },
+      }),
+    ],
+    resolve: {
+      modules: [
+        path.resolve(__dirname, '../src'),
+        './node_modules',
+      ],
+      alias: {
+        // 解决rsuite-picker依赖旧版本react导致找不到react/lib/ReactDOM的问题
+        'react-dom': path.resolve(__dirname, '../node_modules/react-dom'),
+      },
+      extensions: ['.js', '.jsx', '.json'],
+    },
+  };
+  if (isDev) {
+    config = merge(base, {
+      module: {
+        rules: [
+          // 前端页面性能监控
+          {
+            test: require.resolve('react-addons-perf'),
+            use: [{
+              loader: 'expose-loader',
+              options: 'Perf',
+            }],
+          },
+        ],
+      },
+      plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        // 当接收到热更新信号时，在浏览器console控制台打印更多可读性高的模块名称等信息
+        new webpack.NamedModulesPlugin(),
+      ],
+      devServer: {
+        compress: true,
+        open: false,
+        host: '0.0.0.0',
+        port: 3011,
+        index: 'src/index.html',
+        publicPath: '/',
+        historyApiFallback: true, // 设为false会导致手动刷新页面（路由有效）时，报404
+        // 配置热加载,所有配置替代方案：webpack-cli --inline --hot --hot-only
+        inline: true, // 实时刷新
+        // 注意，必须有 webpack.HotModuleReplacementPlugin 才能完全启用 HMR。如果 webpack 或 webpack-dev-server 是通过 --hot 选项启动的，那么这个插件会被自动添加，所以你可能不需要把它添加到 webpack.config.js 中。
+        hot: true, // 模块热更新。依赖于HotModuleReplacementPlugin,或者 entry加入'webpack-dev-server/client?http://0.0.0.0:3104'
+        hotOnly: true, // 或者entry加入[''webpack/hot/only-dev-server'','webpack/hot/poll?1000']
+        watchOptions: {
+          ignored: /node_modules/,
+        },
+        // 配置console.log信息输出
+        noInfo: false,
+        clientLogLevel: 'warning', // 不在浏览器console中输出热加载信息
+        stats: {
+          // copied from `'minimal'`
+          all: false,
+          modules: true,
+          maxModules: 0,
+          errors: true,
+          warnings: true,
+          // our additional options
+          colors: true,
+          timings: true,
+          moduleTrace: true,
+          errorDetails: true,
+          assets: false,
+        },
+      },
+    });
+  } else {
+    config = merge(base, {
+      optimization: {
+        minimizer: [
+          new TerserJSPlugin({
+            test: /\.(js|jsx)(\?.*)?$/i,
+            exclude: [path.resolve(__dirname, '../node_modules')],
+            parallel: 4,
+            terserOptions: {
+              compress: {
+                pure_funcs: ['console.info', 'console.debug', 'console.warn']
+              }
+            }
+          }),
+          new OptimizeCssAssetsPlugin({
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true,
+          }),
+        ],
+        splitChunks: {
+          cacheGroups: {
+            verdor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all'
+            },
+            styles: {
+              name: 'styles',
+              test: /\.css$/,
+              chunks: 'all',
+              enforce: true,
+              priority: 10,
+            },
+          },
+        },
+      },
+      plugins: [
+        new MiniCssExtractPlugin({
+          filename: isDev ? '[name].css' : '[name].[hash:8].css',
+          chunkFilename: isDev ? '[name].chunk.css' : '[name].[hash:8].chunk.css',
+        }),
+      ],
+      stats: 'errors-only',
+    });
+  }
+  return config;
+};
+
+</code></pre>
+<p>根据上述的思路，进行逐一分析</p>
+<p>出现问题的是 production and js文件</p>
+<p>webpack里面 Module rules 匹配的js| jsx 文件并没有对 Mode 不同做出不同的处理，因此排除</p>
+<pre><code class="language-javascript">...
+{
+          test: /\.css$/,
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ],
+        },
+  ...
+</code></pre>
+<p>这个规则虽然有针对不同mode去做特殊处理，但并不是针对js文件来的，因此也排除掉</p>
+<p>less 和 css 的规则大致相同，因此也排除掉</p>
+<p>继续往下看，会发现有个比较有意思的地方</p>
+<pre><code class="language-javascript">...
+if (isDev) {
+    config = merge(base, {
+      module: {
+        rules: [
+          // 前端页面性能监控
+          {
+            test: require.resolve('react-addons-perf'),
+            use: [{
+              loader: 'expose-loader',
+              options: 'Perf',
+            }],
+          },
+        ],
+      },
+      plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        // 当接收到热更新信号时，在浏览器console控制台打印更多可读性高的模块名称等信息
+        new webpack.NamedModulesPlugin(),
+      ],
+      devServer: {
+        compress: true,
+        open: false,
+        host: '0.0.0.0',
+        port: 3011,
+        index: 'src/index.html',
+        publicPath: '/',
+        historyApiFallback: true, // 设为false会导致手动刷新页面（路由有效）时，报404
+        // 配置热加载,所有配置替代方案：webpack-cli --inline --hot --hot-only
+        inline: true, // 实时刷新
+        // 注意，必须有 webpack.HotModuleReplacementPlugin 才能完全启用 HMR。如果 webpack 或 webpack-dev-server 是通过 --hot 选项启动的，那么这个插件会被自动添加，所以你可能不需要把它添加到 webpack.config.js 中。
+        hot: true, // 模块热更新。依赖于HotModuleReplacementPlugin,或者 entry加入'webpack-dev-server/client?http://0.0.0.0:3104'
+        hotOnly: true, // 或者entry加入[''webpack/hot/only-dev-server'','webpack/hot/poll?1000']
+        watchOptions: {
+          ignored: /node_modules/,
+        },
+        // 配置console.log信息输出
+        noInfo: false,
+        clientLogLevel: 'warning', // 不在浏览器console中输出热加载信息
+        stats: {
+          // copied from `'minimal'`
+          all: false,
+          modules: true,
+          maxModules: 0,
+          errors: true,
+          warnings: true,
+          // our additional options
+          colors: true,
+          timings: true,
+          moduleTrace: true,
+          errorDetails: true,
+          assets: false,
+        },
+      },
+    });
+  } else {
+    config = merge(base, {
+      optimization: {
+        minimizer: [
+          new TerserJSPlugin({
+            test: /\.(js|jsx)(\?.*)?$/i,
+            exclude: [path.resolve(__dirname, '../node_modules')],
+            parallel: 4,
+            terserOptions: {
+              compress: {
+                pure_funcs: ['console.info', 'console.debug', 'console.warn']
+              }
+            }
+          }),
+          new OptimizeCssAssetsPlugin({
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true,
+          }),
+        ],
+        splitChunks: {
+          cacheGroups: {
+            verdor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all'
+            },
+            styles: {
+              name: 'styles',
+              test: /\.css$/,
+              chunks: 'all',
+              enforce: true,
+              priority: 10,
+            },
+          },
+        },
+      },
+...
+</code></pre>
+<p>由于问题出现在production模式下，因此我们只需关系 else里面的逻辑即可</p>
+<pre><code class="language-javascript">config = merge(base, {
+      optimization: {
+        minimizer: [
+          new TerserJSPlugin({ }),
+          new OptimizeCssAssetsPlugin({
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true,
+          }),
+        ],
+        splitChunks: {
+          cacheGroups: {
+            verdor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all'
+            },
+            styles: {
+              name: 'styles',
+              test: /\.css$/,
+              chunks: 'all',
+              enforce: true,
+              priority: 10,
+            },
+          },
+        },
+      },
+      plugins: [
+        new MiniCssExtractPlugin({
+          filename: isDev ? '[name].css' : '[name].[hash:8].css',
+          chunkFilename: isDev ? '[name].chunk.css' : '[name].[hash:8].chunk.css',
+        }),
+      ],
+      stats: 'errors-only',
+    });
+</code></pre>
+<p>根据对插件的大概了解，会发现webpack在打包时进行了优化(压缩一下)</p>
+<p><a href="https://webpack.docschina.org/configuration/optimization/#optimizationminimizer">webpack优化参数</a> 有兴趣的可以去了解一下，webpack如何进行优化处理</p>
+<p>一个压缩Js插件 引起了我的注意。<a href="https://webpack.docschina.org/plugins/terser-webpack-plugin/">terset-webpack-plugin</a></p>
+<p>根据上述具体分析得出：异常是 mode = production and js ，那么刚好这个terset插件只有在mode = production 并且用来处理js文件的。通过查看package.json文件，并没有找到这个插件，但通过yarn.lock文件，发现了安装webpack4版本时，一同安装了这个插件。</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20220509_1652064814038976000.png" alt="image-20220509105332989" loading="lazy"></figure>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://a1733452028.github.io/post/webpack-gong-cheng-hua/" class="post-title gt-a-link">
+                    webpack工程化
+                </a>
+            </div>
+        
+
+        
+
+        
+            
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js"></script>
+<script>
+    // md5.min.js
+    !function(n){
+        "use strict";
+        function d(n,t){var r=(65535&n)+(65535&t);return(n>>16)+(t>>16)+(r>>16)<<16|65535&r}
+        function f(n,t,r,e,o,u){return d((c=d(d(t,n),d(e,u)))<<(f=o)|c>>>32-f,r);var c,f}
+        function l(n,t,r,e,o,u,c){return f(t&r|~t&e,n,t,o,u,c)}
+        function v(n,t,r,e,o,u,c){return f(t&e|r&~e,n,t,o,u,c)}
+        function g(n,t,r,e,o,u,c){return f(t^r^e,n,t,o,u,c)}
+        function m(n,t,r,e,o,u,c){return f(r^(t|~e),n,t,o,u,c)}
+        function i(n,t){var r,e,o,u,c;n[t>>5]|=128<<t%32,n[14+(t+64>>>9<<4)]=t;var f=1732584193,i=-271733879,a=-1732584194,h=271733878;for(r=0;r<n.length;r+=16)f=l(e=f,o=i,u=a,c=h,n[r],7,-680876936),h=l(h,f,i,a,n[r+1],12,-389564586),a=l(a,h,f,i,n[r+2],17,606105819),i=l(i,a,h,f,n[r+3],22,-1044525330),f=l(f,i,a,h,n[r+4],7,-176418897),h=l(h,f,i,a,n[r+5],12,1200080426),a=l(a,h,f,i,n[r+6],17,-1473231341),i=l(i,a,h,f,n[r+7],22,-45705983),f=l(f,i,a,h,n[r+8],7,1770035416),h=l(h,f,i,a,n[r+9],12,-1958414417),a=l(a,h,f,i,n[r+10],17,-42063),i=l(i,a,h,f,n[r+11],22,-1990404162),f=l(f,i,a,h,n[r+12],7,1804603682),h=l(h,f,i,a,n[r+13],12,-40341101),a=l(a,h,f,i,n[r+14],17,-1502002290),f=v(f,i=l(i,a,h,f,n[r+15],22,1236535329),a,h,n[r+1],5,-165796510),h=v(h,f,i,a,n[r+6],9,-1069501632),a=v(a,h,f,i,n[r+11],14,643717713),i=v(i,a,h,f,n[r],20,-373897302),f=v(f,i,a,h,n[r+5],5,-701558691),h=v(h,f,i,a,n[r+10],9,38016083),a=v(a,h,f,i,n[r+15],14,-660478335),i=v(i,a,h,f,n[r+4],20,-405537848),f=v(f,i,a,h,n[r+9],5,568446438),h=v(h,f,i,a,n[r+14],9,-1019803690),a=v(a,h,f,i,n[r+3],14,-187363961),i=v(i,a,h,f,n[r+8],20,1163531501),f=v(f,i,a,h,n[r+13],5,-1444681467),h=v(h,f,i,a,n[r+2],9,-51403784),a=v(a,h,f,i,n[r+7],14,1735328473),f=g(f,i=v(i,a,h,f,n[r+12],20,-1926607734),a,h,n[r+5],4,-378558),h=g(h,f,i,a,n[r+8],11,-2022574463),a=g(a,h,f,i,n[r+11],16,1839030562),i=g(i,a,h,f,n[r+14],23,-35309556),f=g(f,i,a,h,n[r+1],4,-1530992060),h=g(h,f,i,a,n[r+4],11,1272893353),a=g(a,h,f,i,n[r+7],16,-155497632),i=g(i,a,h,f,n[r+10],23,-1094730640),f=g(f,i,a,h,n[r+13],4,681279174),h=g(h,f,i,a,n[r],11,-358537222),a=g(a,h,f,i,n[r+3],16,-722521979),i=g(i,a,h,f,n[r+6],23,76029189),f=g(f,i,a,h,n[r+9],4,-640364487),h=g(h,f,i,a,n[r+12],11,-421815835),a=g(a,h,f,i,n[r+15],16,530742520),f=m(f,i=g(i,a,h,f,n[r+2],23,-995338651),a,h,n[r],6,-198630844),h=m(h,f,i,a,n[r+7],10,1126891415),a=m(a,h,f,i,n[r+14],15,-1416354905),i=m(i,a,h,f,n[r+5],21,-57434055),f=m(f,i,a,h,n[r+12],6,1700485571),h=m(h,f,i,a,n[r+3],10,-1894986606),a=m(a,h,f,i,n[r+10],15,-1051523),i=m(i,a,h,f,n[r+1],21,-2054922799),f=m(f,i,a,h,n[r+8],6,1873313359),h=m(h,f,i,a,n[r+15],10,-30611744),a=m(a,h,f,i,n[r+6],15,-1560198380),i=m(i,a,h,f,n[r+13],21,1309151649),f=m(f,i,a,h,n[r+4],6,-145523070),h=m(h,f,i,a,n[r+11],10,-1120210379),a=m(a,h,f,i,n[r+2],15,718787259),i=m(i,a,h,f,n[r+9],21,-343485551),f=d(f,e),i=d(i,o),a=d(a,u),h=d(h,c);return[f,i,a,h]}
+        function a(n){var t,r="",e=32*n.length;for(t=0;t<e;t+=8)r+=String.fromCharCode(n[t>>5]>>>t%32&255);return r}
+        function h(n){var t,r=[];for(r[(n.length>>2)-1]=void 0,t=0;t<r.length;t+=1)r[t]=0;var e=8*n.length;for(t=0;t<e;t+=8)r[t>>5]|=(255&n.charCodeAt(t/8))<<t%32;return r}
+        function e(n){var t,r,e="0123456789abcdef",o="";for(r=0;r<n.length;r+=1)t=n.charCodeAt(r),o+=e.charAt(t>>>4&15)+e.charAt(15&t);return o}
+        function r(n){return unescape(encodeURIComponent(n))}
+        function o(n){return a(i(h(t=r(n)),8*t.length));var t}
+        function u(n,t){return function(n,t){var r,e,o=h(n),u=[],c=[];for(u[15]=c[15]=void 0,16<o.length&&(o=i(o,8*n.length)),r=0;r<16;r+=1)u[r]=909522486^o[r],c[r]=1549556828^o[r];return e=i(u.concat(h(t)),512+8*t.length),a(i(c.concat(e),640))}(r(n),r(t))}
+        function t(n,t,r){return t?r?u(t,n):e(u(t,n)):r?o(n):e(o(n))}
+        "function"==typeof define&&define.amd?define(function(){return t}):"object"==typeof module&&module.exports?module.exports=t:n.md5=t;
+    }(this);
+</script>
+
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '',
+    clientSecret: '',
+    repo: '',
+    owner: '',
+    admin: [''],
+    id: md5(location.pathname),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false       // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+            
+
+            
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">记录运维开发中出现的问题</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by 
+<a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<br><br>
+Copyright 2021 &copy 
+<a href="https://twitter.com/mei_samson" target="_blank">
+<span style="color:blue">lpb</span></a>
+<br><br>
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="blank">
+<span style="color:orange">本博客采用 CC BY-NC-SA 4.0 进行许可</span></a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://a1733452028.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.highlightAll()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

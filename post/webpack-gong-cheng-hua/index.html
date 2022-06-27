@@ -1,0 +1,1075 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>webpack工程化 | PbRcord</title>
+
+<link rel="shortcut icon" href="https://a1733452028.github.io/favicon.ico?v=1656295333320">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://a1733452028.github.io/styles/main.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+
+<style>
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            PbRcord
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1656295333320"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = () => {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    webpack工程化
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-12-15 ·
+                    </time>
+                    
+                        <a href="https://a1733452028.github.io/tag/CPSh7zlHy/" class="post-tags">
+                            # webpack
+                        </a>
+                    
+                        <a href="https://a1733452028.github.io/tag/2ym_BagMT/" class="post-tags">
+                            # react
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h3 id="迁移原因">迁移原因</h3>
+<p>由于roadhogrc封装的webpack版本太旧，不适合用于现代组件的打包，因此会在引用高版本的组件时出现语法错误等原因，最终导致打包失败(严重影响项目的正常运行)</p>
+<h3 id="1-如何运行webpack">1、如何运行webpack</h3>
+<p>在迁移之前需要弄懂如何通过简答的webpack来运行项目</p>
+<p>安装webpack时，最好使用最高版本的node.js来安装</p>
+<p><em><strong>webpack-cli: 命令行工具(webpack5 可以不需要了)</strong></em></p>
+<pre><code class="language-cmd">yarn add webapck, webapck-cli
+</code></pre>
+<h3 id="2-文件目录结构">2、文件目录结构</h3>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214194736283.png" alt="image-20211214194736283" loading="lazy"></figure>
+<p>config ：存放webpack的配置文件</p>
+<p>src ：存放业务逻辑文件</p>
+<p>package.json：记录依赖包的版本号</p>
+<p>生产环境下</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211215093347005.png" alt="image-20211215093347005" loading="lazy"></figure>
+<p>通过对比，会发现新增了一个文件.babelrc</p>
+<p>.babelrc 文件主要是配置babel-loader的参数</p>
+<pre><code class="language-javascript">{
+  &quot;presets&quot;: [
+    [
+      &quot;@babel/preset-env&quot;,
+      {
+        &quot;useBuiltIns&quot;: false,
+        &quot;modules&quot;: false
+      }
+    ],
+    &quot;@babel/preset-react&quot;
+  ],
+  &quot;plugins&quot;: [
+    [
+      &quot;@babel/plugin-transform-runtime&quot;,
+      {
+        &quot;corejs&quot;: 3
+      }
+    ],
+    &quot;@babel/plugin-transform-modules-commonjs&quot;,
+    &quot;@babel/plugin-syntax-dynamic-import&quot;,
+    [
+      &quot;babel-plugin-import&quot;,
+      {
+        &quot;libraryName&quot;: &quot;antd&quot;,
+        &quot;libraryDirectory&quot;: &quot;es&quot;,
+        &quot;style&quot;: true
+      }
+    ],
+    &quot;inline-react-svg&quot;,
+    &quot;@babel/plugin-transform-reserved-words&quot;,
+    &quot;@babel/plugin-proposal-export-default-from&quot;,
+    &quot;@babel/plugin-proposal-nullish-coalescing-operator&quot;,
+    &quot;@babel/plugin-proposal-optional-chaining&quot;,
+    [&quot;@babel/plugin-proposal-decorators&quot;,{
+      &quot;legacy&quot;: true
+    }],
+    &quot;@babel/plugin-proposal-class-properties&quot;
+  ]
+}
+</code></pre>
+<h3 id="3-webpack-基本配置">3、webpack 基本配置</h3>
+<p>Resolve: 这些选项能设置模块如何被解析。webpack 提供合理的默认值，但是还是可能会修改一些解析的细节。关于 resolver 具体如何工作的更多解释说明，请查看<a href="https://webpack.docschina.org/concepts/module-resolution">模块解析</a></p>
+<p><code>Resolve.extensions</code> 尝试按顺序解析这些后缀名。如果有多个文件有相同的名字，但后缀名不同，webpack 会解析列在数组首位的后缀的文件 并跳过其余的后缀。</p>
+<p><code>asset/resource</code> 发送一个单独的文件并导出 URL。之前通过使用 <code>file-loader</code> 实现。</p>
+<p><code>css-loader</code> 主要是解析css文件中的@import和url语句，处理css-modules，并将结果作为一个js模块返回。通俗的来说：会处理import/require() @import/url 引入的内容  <em><strong>重点: css-loader处理之后，返回的是数组，页面无法实现数组</strong></em></p>
+<pre><code class="language-javascript">// 假如我们有a.css、b.css、c.css
+
+// a.css
+@import './b.css'; // 导入b.css
+
+.a {
+  font-size: 16px;
+}
+
+// b.css
+@import './c.css'; // 导入c.css
+
+.b {
+  color: red;
+}
+
+// c.css
+.c {
+  font-weight: bolder;
+}
+
+// 可以理解为css-loader将a.css、b.css和c.css的样式内容以字符串的形式拼接在一起，并将其作为js模块的导出内容。
+
+// css-loader源码（经简化）
+// https://github.com/webpack-contrib/css-loader/blob/master/src/index.js
+import postcss from 'postcss';
+
+module.exports = async function (content, map, meta) {
+  const options = this.getOptions(); // 获取配置
+
+  const plugins = []; // 转译源码所需的postcss插件
+  shouldUseModulesPlugins(options, this) &amp;&amp; plugins.push(modulesPlugins); // 处理css-modules
+  shouldUseImportPlugin(options, this) &amp;&amp; plugins.push(importPlugin); // 处理@import语句
+  shouldUseURLPlugin(options, this) &amp;&amp; plugins.push(urlPlugin); // 处理url()语句
+  shouldUseIcssPlugin(options, this) &amp;&amp; plugins.push(icssPlugin); // 处理icss相关逻辑
+
+  if (meta &amp;&amp; meta.ast) { // 复用前面loader生成的CSS AST（如postcss-loader）
+    content = meta.ast.root;
+  }
+
+  const result = await postcss(plugins).process(content); // 使用postcss转译源码
+
+  const importCode = getImportCode(); // 需要导入的依赖语句
+  const moduleCode = getModuleCode(result); // 模块导出内容
+  const exportCode = getExportCode(); // 其他需要导出的信息，如css-modules的类名映射等
+
+  const callback = this.async(); // 异步返回
+  callback(null, `${importCode}${moduleCode}${exportCode}`);
+};
+</code></pre>
+<p><code>style-loader</code> 经过css-loader的转译，我们已经得到了完整的css样式代码，style-loader的作用就是将结果以style标签的方式插入DOM树中。通俗来说：css-loader 解析后的内容挂载到html页面中。 <strong>因此：需要搭配css-loader使用</strong></p>
+<pre><code class="language-javascript">// 但css-loader返回的不是css样式代码的文本，而是一个js模块的代码，将这些js代码直接放进style标里显然是不行的。
+
+// style-loader
+import loaderUtils from 'loader-utils';
+
+module.exports = function (content) {
+  // do nothing
+};
+
+module.exports.pitch = function (remainingRequest) {
+  /*
+  * 用require语句获取css-loader返回的js模块的导出
+  * 用'!!'前缀跳过配置中的loader，避免重复执行
+  * 用remainingRequest参数获取loader链的剩余部分，在本例中是css-loader、less-loader
+  * 用loaderUtils的stringifyRequest方法将request语句中的绝对路径转为相对路径
+  */
+  const requestPath = loaderUtils.stringifyRequest(this, '!!' + remainingRequest);
+
+  // 本例中requestPath为:
+  // '!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!src/styles/index.less'
+
+  return `
+    const content = require(${requestPath})
+    const style = document.createElement('style');
+    style.innerHTML = content;
+    document.head.appendChild(style);
+  `;
+};
+</code></pre>
+<p><code>less-loader</code> **<a href="https://link.zhihu.com/?target=http%3A//lesscss.cn/">Less</a>**是CSS预处理语言，扩展了CSS语言，增加了变量、Mixin、函数等特性，Less-loader的作用就是将less代码转译为浏览器可以识别的CSS代码。</p>
+<pre><code class="language-javascript">// demo.less
+@base: #f938ab;
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  -webkit-box-shadow: @style @c;
+  box-shadow:         @style @c;
+}
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+.box {
+  color: saturate(@base, 5%);
+  border-color: lighten(@base, 30%);
+  div { .box-shadow(0 0 5px, 30%) }
+}
+
+// 上面的less代码会被less-loader编译成
+// demo.css
+.box {
+  color: #fe33ac;
+  border-color: #fdcdea;
+}
+.box div {
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+// less-loader 原理：
+// less-loader实现（经简化）
+const less = require('less');
+
+module.exports = function(content) {
+  const callback = this.async(); // 转译比较耗时，采用异步方式
+  const options = this.getOptions(); // 获取配置文件中less-loader的options
+  
+  less.render(
+    content,
+    createOptions(options), // less转译的配置
+    (err, output) =&gt; {
+      callback(err, output.css); // 将生成的css代码传递给下一个loader
+    }
+  );
+};
+</code></pre>
+<p>webpack.commont.js</p>
+<pre><code class="language-javascript">module.exports = {
+  // 入口
+  entry: {
+    index: './src/index.js',
+  },
+  // 输出
+  output: {
+    filename: '[name].bundle.js' || '[name].[contenthash].bundle.js',
+    path: paths.appDist,
+    // publicPath: paths.appPublic,
+    // 编译前清除目录
+    clean: true
+  },
+  resolve: {
+    extensions: ['.tsx', '.jsx', '.ts', '.js'], 
+  },
+  plugins: [
+    // 生成html，自动引入所有bundle
+    new HtmlWebpackPlugin({
+      title: 'release_v1',
+    }),
+    // 进度条
+    new ProgressBarPlugin({
+      format:'  :msg [:bar] :percent (:elapsed s)'
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        include: [
+          paths.appSrc,
+        ],
+        type: 'asset/resource',
+      },
+      {
+        test: /.(woff|woff2|eot|ttf|otf)$/i,
+        include: [
+           paths.appSrc,
+         ],
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          'css-loader',
+        ],
+      },
+      {
+        test: /.(scss|sass)$/,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          'css-loader',
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.module\.(scss|sass)$/,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          {
+            loader: 'css-loader',
+            options: {
+              // Enable CSS Modules features
+              modules: true,
+              importLoaders: 2,
+              // 0 =&gt; no loaders (default);
+              // 1 =&gt; postcss-loader;
+              // 2 =&gt; postcss-loader, sass-loader
+            },
+          },
+          // 将 PostCSS 编译成 CSS
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    // postcss-preset-env 包含 autoprefixer
+                    'postcss-preset-env',
+                  ],
+                ],
+              },
+            },
+          },
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.(js|ts|jsx|tsx)$/,
+        include: paths.appSrc,
+        use: [
+          {
+            loader: 'esbuild-loader',
+            options: {
+              loader: 'tsx',
+              target: 'es2015',
+            },
+          }
+        ]
+      }
+    ],
+  },
+}
+</code></pre>
+<p>Webpack.dev.js</p>
+<pre><code class="language-javascript">module.exports = merge(common, {
+  // 模式
+  mode: 'development',
+  // 开发工具，开启 source map，编译调试
+  devtool: 'eval-cheap-module-source-map',
+  // 开发模式，自动更新改动
+  devServer: {
+    static: './dist',
+  },
+})
+</code></pre>
+<p><code>devtool</code> 中的cheap-module“不包含列信息，源码是开发时的代码”;eval&quot;生成代码和Source Map 内容混淆在一起&quot;</p>
+<p><code>mode</code> webpack 环境配置 一般只使用'Development'和'Production'(简称 开发环境 和 生产环境)</p>
+<p><code>devtool</code> 配置 推荐</p>
+<ul>
+<li>开发环境 ： eval-cheap-module-source-map</li>
+<li>生产环境： nosources-source-map 或者 source-map</li>
+</ul>
+<p>使用上述的配置，即可运行项目 <code>webpack-dev-server -config config/webpack.dev.js -open</code></p>
+<p><code>devServer.static</code> 该配置项允许配置从目录提供静态文件的选项（默认是 'public' 文件夹）。将其设置为 <code>false</code> 以禁用。简单的来理解，devServer读取的静态文件都是从当前的./dist文件来读取的</p>
+<h3 id="4-蓝天项目-roadhogrc-迁移至-webpack5-注意事项">4、蓝天项目 roadhogrc 迁移至 webpack5 注意事项</h3>
+<p>以开发环境为例子</p>
+<p><code>webpack.commont.js</code>文件改造成</p>
+<pre><code class="language-javascript">const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const paths = require('./paths');
+
+const lessToJs = require('less-vars-to-js');
+const fs = require('fs');
+const paletteLess = fs.readFileSync(paths.resolveApp('src/styles/variables.less'), 'utf8');
+const lessVars = lessToJs(paletteLess, { resolveVariables: true, stripPrefix: true });
+
+module.exports = {
+  target: ['web', 'es5'],
+  context: paths.appContext,
+  // 入口
+  entry: {
+    index: './src/index.js',
+  },
+  // 输出
+  output: {
+    filename: '[name].js',
+    path: paths.appDist,
+    publicPath: '/',
+    chunkFilename: '[name].chunk.js',
+    // publicPath: paths.appPublic,
+    // 编译前清除目录
+    // clean: true,
+    pathinfo: false
+  },
+  resolve: {
+    extensions: ['.tsx', '.jsx', '.ts', '.js', '.json'],
+    fallback: {
+      fs: false,
+      stream: false,
+      path: false,
+      crypto: false
+    },
+    modules: [
+      paths.appSrc,
+      paths.appNodeModules,
+      paths.appNodeModulesResolveOwn,
+      'node_modules'
+    ],
+    symlinks: false,
+    alias: {
+      Utils: paths.appUtils,
+      '@babel/runtime': '@babel/runtime-corejs2',
+    },
+  },
+  plugins: [
+    // 生成html，自动引入所有bundle
+    new HtmlWebpackPlugin({
+      // favicon: paths.appLogo,
+      title: '蓝天系统',
+      mountRoot: 'root',
+      template: paths.appHtml,
+      filename: 'index.html',
+      inject: 'body',
+      htmlContent: '&lt;%- __html__ %&gt;',
+      initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+      hash: true,    // 为静态资源生成hash值
+      minify: {    // 压缩HTML文件
+        removeComments: false,    // 移除HTML中的注释
+        collapseWhitespace: false,    // 删除空白符与换行符
+      },
+    }),
+    // 进度条
+    new ProgressBarPlugin({
+      format: '  :msg [:bar] :percent (:elapsed s)'
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: paths.appPublic, to: 'public', toType: 'dir' },
+      ]
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.(js|ts|jsx)$/,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        use: [
+          {
+            loader: 'thread-loader',
+            options: {
+              workers: 10
+            }
+          },
+          {
+            loader: 'babel-loader?cacheDirectory',
+          },
+        ]
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/i,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        type: 'asset/resource',
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 1024 * 10,
+            outputPath: 'images'
+          }
+        }
+      },
+      {
+        test: /.(woff|woff2|eot|ttf|otf)$/i,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            }
+          },
+        ],
+      },
+      {
+        test: /\.js\.map$/,
+        use: {
+          loader: 'file-loader'
+        },
+      },
+      {
+        test: /\.less$/,
+        include: /[\\/]node_modules[\\/].*antd/,
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+              lessOptions: {
+                javascriptEnabled: true,
+                math: 'always',
+                modifyVars: { ...lessVars, },
+              }
+            },
+          },
+        ],
+      },
+      {
+        test: /\.less$/,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[name]__[local]'
+              },
+              importLoaders: 2,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              implementation: require.resolve('less'),
+              sourceMap: true,
+              lessOptions: {
+                javascriptEnabled: true,
+                modifyVars: lessVars,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /.(scss|sass)$/,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          'css-loader',
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        exclude: paths.appNodeModules,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[path][name].[ext]',
+              outputPath: 'images/',
+            }
+          }
+        ]
+      },
+      {
+        test: /\.svg$/,
+        include: paths.appSrc,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'images/',
+            }
+          }
+        ],
+        exclude: paths.appNodeModules,
+      },
+      {
+        test: /\.module\.(scss|sass)$/,
+        exclude: paths.appNodeModules,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          {
+            loader: 'css-loader',
+            options: {
+              // Enable CSS Modules features
+              modules: true,
+              importLoaders: 2,
+              // 0 =&gt; no loaders (default);
+              // 1 =&gt; postcss-loader;
+              // 2 =&gt; postcss-loader, sass-loader
+            },
+          },
+          // 将 PostCSS 编译成 CSS
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    // postcss-preset-env 包含 autoprefixer
+                    'postcss-preset-env',
+                  ],
+                ],
+              },
+            },
+          },
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+
+    ],
+  },
+};
+
+</code></pre>
+<p>新增一个文件paths.js</p>
+<pre><code class="language-javascript">const fs = require('fs')
+const path = require('path')
+
+const appDirectory = process.cwd();
+const resolveApp = relativePath =&gt; path.resolve(appDirectory, relativePath);
+
+function resolveOwn (relative) {
+  return path.resolve(__dirname, '.', relative);
+}
+
+module.exports = {
+  resolveApp,
+  appPublic: resolveApp('public'),
+  appHtml: resolveApp('src/index.html'),
+  appSrc: resolveApp('src'),
+  appDist: resolveApp('dist'),
+  appNodeModules: resolveApp(&quot;node_modules&quot;),
+  appTsConfig: resolveApp('tsconfig.json'),
+  appContext: resolveApp(&quot;./&quot;),
+  appUtils: resolveApp(&quot;src/utils&quot;),
+  appNodeModulesResolveOwn: resolveOwn(&quot;node_modules&quot;),
+  appLogo: resolveApp(&quot;public/fonts/svg/logo.svg&quot;)
+}
+
+</code></pre>
+<p>websocket.dev.js</p>
+<pre><code class="language-javascript">const { merge } = require('webpack-merge');
+const paths = require('./paths');
+const common = require('./webpack.common');
+const TerserPlugin = require('terser-webpack-plugin');
+// const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+
+
+// const smp = new SpeedMeasurePlugin();
+
+module.exports = merge(common, {
+  // 开启缓存
+  cache: {
+    type: 'filesystem'
+  },
+  // 模式
+  mode: 'development',
+  // 开发工具，开启 source map，编译调试
+  devtool: 'eval-cheap-module-source-map',
+  plugins: [
+    // new BundleAnalyzerPlugin()
+  ],
+  // 开发模式，自动更新改动
+  devServer: {
+    port: 3010,
+    historyApiFallback: true, // 设为false会导致手动刷新页面（路由有效）时，报404
+    compress: true, // gzip 压缩
+    hot: 'only', // 启用热模块替换功能，在构建失败时不刷新页面作为回退，使用 hot: 'only'
+    proxy: {
+      '/api': {
+        target: 'https://devnbas.gz4399.com/',
+        changeOrigin: true,
+      }
+    },
+    setupExitSignals: true,  //允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器和退出进程
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        test: /\.(jsx|js)$/,
+        extractComments: true,
+        parallel: true,
+      }),
+    ],
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true,
+          priority: 10,
+        },
+      },
+    },
+  },
+});
+
+</code></pre>
+<p>可能会遇到的问题</p>
+<p>1、<code>ERROR in ./node_modules/dva-core/lib/Plugin.js 13:43-89</code></p>
+<pre><code class="language-cmd">ERROR in ./node_modules/dva-core/lib/Plugin.js 13:43-89
+Module not found: Error: Package path ./core-js/get-iterator is not exported from package /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/@babel/runtime (see exports field in /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/@babel/runtime/package.json)
+ @ ./node_modules/dva-core/lib/index.js 28:38-57
+ @ ./node_modules/dva-core/index.js 1:0-33
+ @ ./node_modules/dva/lib/index.js 96:15-34
+ @ ./node_modules/dva/index.js 5:0-34
+ @ ./src/index.js 13:34-48
+</code></pre>
+<p>解决办法：</p>
+<p>@babel/runtime 使用别的模块(@babel/runtime-corejs2)来 解析</p>
+<p>在webpack的reslove解析函数中找到alias把@babel/runtime 添加进去</p>
+<figure data-type="image" tabindex="3"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214230947328.png" alt="image-20211214230947328" loading="lazy"></figure>
+<p>2、<code>Inline JavaScript is not enabled. Is it set in your options?</code></p>
+<pre><code class="language-cmd"> .bezierEasingMixin();
+^
+Inline JavaScript is not enabled. Is it set in your options?
+
+ Error in /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/antd/es/style/color/bezierEasing.less (line 110, column 0)
+ @ ./node_modules/antd/es/input-number/style/index.less 8:6-188 22:17-24 26:7-21 58:25-39 59:36-47 59:50-64 63:6-73:7 64:54-65 64:68-82 70:42-53 70:56-70 72:21-28 83:0-158 83:0-158 84:22-29 84:33-47 84:50-64 61:4-74:5
+ @ ./node_modules/antd/es/input-number/style/index.js 2:0-22
+ @ ./src/routes/Devops/Log/QueryForm.jsx 99:0-37
+ @ ./src/routes/Devops/index.js 156:13-38
+ @ ./src/routes/BasicLayout.jsx 167:13-31
+ @ ./src/routes/index.js 27:42-66
+ @ ./src/index.js 89:11-41
+
+</code></pre>
+<p>解决方法：通过设置less-loader的options来解决</p>
+<figure data-type="image" tabindex="4"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214232044920.png" alt="image-20211214232044920" loading="lazy"></figure>
+<p>打开注释lessOptions中的 javascriptEnabled:true即可解决 less 行内联样式的问题</p>
+<figure data-type="image" tabindex="5"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214232412124.png" alt="image-20211214232412124" loading="lazy"></figure>
+<p>3、<code>Error evaluating function </code>unit<code>: the first argument to unit must be a number. Have you forgotten parenthesis?</code></p>
+<pre><code class="language-cmd">        &amp;.@{select-tree-prefix-cls}-switcher_open {
+          .antTreeSwitcherIcon();
+        ^
+Error evaluating function `unit`: the first argument to unit must be a number. Have you forgotten parenthesis?
+      Error in /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/antd/es/tree-select/style/index.less (line 93, column 10)
+ @ ./node_modules/antd/es/tree-select/style/index.less 8:6-188 22:17-24 26:7-21 58:25-39 59:36-47 59:50-64 63:6-73:7 64:54-65 64:68-82 70:42-53 70:56-70 72:21-28 83:0-158 83:0-158 84:22-29 84:33-47 84:50-64 61:4-74:5
+ @ ./node_modules/antd/es/tree-select/style/index.js 2:0-22
+ @ ./src/routes/Cmdb/UserAdd.jsx 49:0-36
+ @ ./src/routes/Cmdb/UserList.jsx 45:38-58
+ @ ./src/routes/Cmdb/index.js 113:13-33
+ @ ./src/routes/BasicLayout.jsx 140:13-29
+ @ ./src/routes/index.js 27:42-66
+ @ ./src/index.js 89:11-41
+
+</code></pre>
+<p>Unit 解析失败，unit 用于计算 的, 而目前@select-tree-prefix-cls 是一个变量。</p>
+<p>解决方案：忽略计算先。less-loader.options.lessoptions.math = &quot;always&quot;(扩展 parens | strict 代表所有数学表达式都需要括号)</p>
+<figure data-type="image" tabindex="6"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214232919137.png" alt="image-20211214232919137" loading="lazy"></figure>
+<p>4、<code>ERROR in ./public/service.png 1:0 Module parse failed: Unexpected character '�' (1:0)</code></p>
+<pre><code class="language-cmd">ERROR in ./public/service.png 1:0
+Module parse failed: Unexpected character '�' (1:0)
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+(Source code omitted for this binary file)
+ @ ./src/routes/components/Support/index.js 79:38-79
+ @ ./src/routes/components/Footer.jsx 19:38-58
+ @ ./src/routes/BasicLayout.jsx 79:37-67
+ @ ./src/routes/index.js 27:42-66
+ @ ./src/index.js 89:11-41
+
+</code></pre>
+<p>问题分析：根据错误提示指出 png文件出现了无法解析的字符�，你可能需要一个解析器来处理</p>
+<p>解决思路：通过添加file-loader解析来处理png, jpg, gif等文件</p>
+<figure data-type="image" tabindex="7"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211215093049945.png" alt="image-20211215093049945" loading="lazy"></figure>
+<p>5、<code>ERROR in ./public/fonts/svg/箭头.svg 1:0 Module parse failed: Unexpected token (1:0) You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file.</code></p>
+<p>ERROR in ./public/fonts/svg/箭头.svg 1:0<br>
+Module parse failed: Unexpected token (1:0)<br>
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders</p>
+<blockquote>
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1598581595686" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3474" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><defs><style type="text/css"></style></defs><path d="M356.4 958.5c-6.4 0-12.8-2.4-17.7-7.3-9.8-9.8-9.8-25.6 0-35.4l403.7-403.7-403.7-403.6c-9.8-9.8-9.8-25.6 0-35.4 9.8-9.8 25.6-9.8 35.4 0l421.3 421.3c9.8 9.8 9.8 25.6 0 35.4L374.1 951.2c-4.9 4.9-11.3 7.3-17.7 7.3z" p-id="3475"></path></svg>
+<p>@ ./src/routes/DataBase/Examine/Query/CreateRightCardAce.jsx 87:33-92<br>
+@ ./src/routes/DataBase/Examine/Query/CreateRightCard.jsx 41:49-80<br>
+@ ./src/routes/DataBase/Examine/Query/Create.jsx 55:46-74<br>
+@ ./src/routes/DataBase/Examine/index.jsx 108:13-37 90:13-37<br>
+@ ./src/routes/DataBase/index.js 128:13-32<br>
+@ ./src/routes/BasicLayout.jsx 164:13-33<br>
+@ ./src/routes/index.js 27:42-66<br>
+@ ./src/index.js 89:11-41</p>
+</blockquote>
+<p>问题分析：根据错误路径分析 错误都是出现在 jsx或者js文件中，而解析js 或者 jsx时都会使用babel-loader。而定义babel-loader解析器都是在.babelrc文件中。错误内容是无法解析svg的内容，因此需要一款svg的解析器</p>
+<figure data-type="image" tabindex="8"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211215_1639532502530104000.png" alt="image-20211215094026960" loading="lazy"></figure>
+<p>解决办法： plugins 插件中 安装 inline-react-svg来解决</p>
+<p>6、<code>export 'Route' (imported as 'Route') was not found in '../../components/Route' (module has no exports)</code></p>
+<p>WARNING in ./src/routes/Ywops/Webssh/index.js 59:46-51<br>
+export 'Route' (imported as 'Route') was not found in '../../components/Route' (module has no exports)<br>
+@ ./src/routes/Ywops/index.js 231:13-31<br>
+@ ./src/routes/BasicLayout.jsx 100:13-30<br>
+@ ./src/routes/index.js 7:0-40 31:46-57 41:15-26<br>
+@ ./src/index.js 75:11-41</p>
+<p>问题分析：错误路径发生在.js 文件中，因此看babel-loader的配置；错误内容相对路径导入有问题。</p>
+<p>解决办法：引入@babel/plugin-transform-modules-commonjs 来解决</p>
+<figure data-type="image" tabindex="9"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211215100217041.png" alt="image-20211215100217041" loading="lazy"></figure>
+<p>7、<code>process is not defined  core.js</code></p>
+<p>Core.js 的路径 是 /node_modules/vfile/core.js</p>
+<pre><code class="language-cmd">Uncaught (in promise) ReferenceError: process is not defined
+    at new VFile (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:8073)
+    at VFile (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:8067)
+    at Function.parse (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:7553)
+    at ReactMarkdown (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:6721)
+    at renderWithHooks (index.js:204994)
+    at mountIndeterminateComponent (index.js:207076)
+    at beginWork (index.js:207681)
+    at performUnitOfWork (index.js:211368)
+    at workLoop (index.js:211408)
+    at renderRoot (index.js:211491)
+</code></pre>
+<p>因此解决办法是：</p>
+<p>单独对core.js的文件更换解析器来解决</p>
+<figure data-type="image" tabindex="10"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211216101304318.png" alt="image-20211216101304318" loading="lazy"></figure>
+<pre><code class="language-javascript">{
+  test: /node_modules(\/|\\)vfile(\/|\\)core\.js/,
+  use: [{
+    loader: 'imports-loader',
+    options: {
+      type: 'commonjs',
+      imports: ['single process/browser process'],
+    },
+  }],
+},
+</code></pre>
+<h3 id="5-未完待续">5、未完待续</h3>
+<p>以后若遇到其他的问题，我会继续补充上~</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://a1733452028.github.io/post/antv-g6-ke-shi-hua-de-tan-suo/" class="post-title gt-a-link">
+                    antV G6可视化的探索
+                </a>
+            </div>
+        
+
+        
+
+        
+            
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js"></script>
+<script>
+    // md5.min.js
+    !function(n){
+        "use strict";
+        function d(n,t){var r=(65535&n)+(65535&t);return(n>>16)+(t>>16)+(r>>16)<<16|65535&r}
+        function f(n,t,r,e,o,u){return d((c=d(d(t,n),d(e,u)))<<(f=o)|c>>>32-f,r);var c,f}
+        function l(n,t,r,e,o,u,c){return f(t&r|~t&e,n,t,o,u,c)}
+        function v(n,t,r,e,o,u,c){return f(t&e|r&~e,n,t,o,u,c)}
+        function g(n,t,r,e,o,u,c){return f(t^r^e,n,t,o,u,c)}
+        function m(n,t,r,e,o,u,c){return f(r^(t|~e),n,t,o,u,c)}
+        function i(n,t){var r,e,o,u,c;n[t>>5]|=128<<t%32,n[14+(t+64>>>9<<4)]=t;var f=1732584193,i=-271733879,a=-1732584194,h=271733878;for(r=0;r<n.length;r+=16)f=l(e=f,o=i,u=a,c=h,n[r],7,-680876936),h=l(h,f,i,a,n[r+1],12,-389564586),a=l(a,h,f,i,n[r+2],17,606105819),i=l(i,a,h,f,n[r+3],22,-1044525330),f=l(f,i,a,h,n[r+4],7,-176418897),h=l(h,f,i,a,n[r+5],12,1200080426),a=l(a,h,f,i,n[r+6],17,-1473231341),i=l(i,a,h,f,n[r+7],22,-45705983),f=l(f,i,a,h,n[r+8],7,1770035416),h=l(h,f,i,a,n[r+9],12,-1958414417),a=l(a,h,f,i,n[r+10],17,-42063),i=l(i,a,h,f,n[r+11],22,-1990404162),f=l(f,i,a,h,n[r+12],7,1804603682),h=l(h,f,i,a,n[r+13],12,-40341101),a=l(a,h,f,i,n[r+14],17,-1502002290),f=v(f,i=l(i,a,h,f,n[r+15],22,1236535329),a,h,n[r+1],5,-165796510),h=v(h,f,i,a,n[r+6],9,-1069501632),a=v(a,h,f,i,n[r+11],14,643717713),i=v(i,a,h,f,n[r],20,-373897302),f=v(f,i,a,h,n[r+5],5,-701558691),h=v(h,f,i,a,n[r+10],9,38016083),a=v(a,h,f,i,n[r+15],14,-660478335),i=v(i,a,h,f,n[r+4],20,-405537848),f=v(f,i,a,h,n[r+9],5,568446438),h=v(h,f,i,a,n[r+14],9,-1019803690),a=v(a,h,f,i,n[r+3],14,-187363961),i=v(i,a,h,f,n[r+8],20,1163531501),f=v(f,i,a,h,n[r+13],5,-1444681467),h=v(h,f,i,a,n[r+2],9,-51403784),a=v(a,h,f,i,n[r+7],14,1735328473),f=g(f,i=v(i,a,h,f,n[r+12],20,-1926607734),a,h,n[r+5],4,-378558),h=g(h,f,i,a,n[r+8],11,-2022574463),a=g(a,h,f,i,n[r+11],16,1839030562),i=g(i,a,h,f,n[r+14],23,-35309556),f=g(f,i,a,h,n[r+1],4,-1530992060),h=g(h,f,i,a,n[r+4],11,1272893353),a=g(a,h,f,i,n[r+7],16,-155497632),i=g(i,a,h,f,n[r+10],23,-1094730640),f=g(f,i,a,h,n[r+13],4,681279174),h=g(h,f,i,a,n[r],11,-358537222),a=g(a,h,f,i,n[r+3],16,-722521979),i=g(i,a,h,f,n[r+6],23,76029189),f=g(f,i,a,h,n[r+9],4,-640364487),h=g(h,f,i,a,n[r+12],11,-421815835),a=g(a,h,f,i,n[r+15],16,530742520),f=m(f,i=g(i,a,h,f,n[r+2],23,-995338651),a,h,n[r],6,-198630844),h=m(h,f,i,a,n[r+7],10,1126891415),a=m(a,h,f,i,n[r+14],15,-1416354905),i=m(i,a,h,f,n[r+5],21,-57434055),f=m(f,i,a,h,n[r+12],6,1700485571),h=m(h,f,i,a,n[r+3],10,-1894986606),a=m(a,h,f,i,n[r+10],15,-1051523),i=m(i,a,h,f,n[r+1],21,-2054922799),f=m(f,i,a,h,n[r+8],6,1873313359),h=m(h,f,i,a,n[r+15],10,-30611744),a=m(a,h,f,i,n[r+6],15,-1560198380),i=m(i,a,h,f,n[r+13],21,1309151649),f=m(f,i,a,h,n[r+4],6,-145523070),h=m(h,f,i,a,n[r+11],10,-1120210379),a=m(a,h,f,i,n[r+2],15,718787259),i=m(i,a,h,f,n[r+9],21,-343485551),f=d(f,e),i=d(i,o),a=d(a,u),h=d(h,c);return[f,i,a,h]}
+        function a(n){var t,r="",e=32*n.length;for(t=0;t<e;t+=8)r+=String.fromCharCode(n[t>>5]>>>t%32&255);return r}
+        function h(n){var t,r=[];for(r[(n.length>>2)-1]=void 0,t=0;t<r.length;t+=1)r[t]=0;var e=8*n.length;for(t=0;t<e;t+=8)r[t>>5]|=(255&n.charCodeAt(t/8))<<t%32;return r}
+        function e(n){var t,r,e="0123456789abcdef",o="";for(r=0;r<n.length;r+=1)t=n.charCodeAt(r),o+=e.charAt(t>>>4&15)+e.charAt(15&t);return o}
+        function r(n){return unescape(encodeURIComponent(n))}
+        function o(n){return a(i(h(t=r(n)),8*t.length));var t}
+        function u(n,t){return function(n,t){var r,e,o=h(n),u=[],c=[];for(u[15]=c[15]=void 0,16<o.length&&(o=i(o,8*n.length)),r=0;r<16;r+=1)u[r]=909522486^o[r],c[r]=1549556828^o[r];return e=i(u.concat(h(t)),512+8*t.length),a(i(c.concat(e),640))}(r(n),r(t))}
+        function t(n,t,r){return t?r?u(t,n):e(u(t,n)):r?o(n):e(o(n))}
+        "function"==typeof define&&define.amd?define(function(){return t}):"object"==typeof module&&module.exports?module.exports=t:n.md5=t;
+    }(this);
+</script>
+
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '',
+    clientSecret: '',
+    repo: '',
+    owner: '',
+    admin: [''],
+    id: md5(location.pathname),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false       // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+            
+
+            
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">记录运维开发中出现的问题</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by 
+<a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<br><br>
+Copyright 2021 &copy 
+<a href="https://twitter.com/mei_samson" target="_blank">
+<span style="color:blue">lpb</span></a>
+<br><br>
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="blank">
+<span style="color:orange">本博客采用 CC BY-NC-SA 4.0 进行许可</span></a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://a1733452028.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.highlightAll()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

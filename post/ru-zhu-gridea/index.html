@@ -1,0 +1,686 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>如何开发智能客服系统 | PbRcord</title>
+
+<link rel="shortcut icon" href="https://a1733452028.github.io/favicon.ico?v=1656295333320">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://a1733452028.github.io/styles/main.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+
+<style>
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            PbRcord
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="https://a1733452028.github.io/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1656295333320"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = () => {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    如何开发智能客服系统
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-08-31 ·
+                    </time>
+                    
+                        <a href="https://a1733452028.github.io/tag/P477YL1a4/" class="post-tags">
+                            # goland
+                        </a>
+                    
+                        <a href="https://a1733452028.github.io/tag/2ym_BagMT/" class="post-tags">
+                            # react
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h2 id="如何开发智能客服系统">如何开发智能客服系统</h2>
+<h4 id="前言">前言</h4>
+<p>​	在线客服系统是一种网页版即时通讯软件的统称。主要能实现对其他通信软件无缝衔接(小编这里主要是指飞书和其他各大内部系统)，为网站以及其他的应用提供和访客对话的平台。</p>
+<h4 id="准备工作">准备工作</h4>
+<p>​	”so easy 嘛！需求文档, 拿来吧你~“</p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629684467273665000.jpeg" alt="拿来吧你表情包分享-拿来吧你表情包汇总_游戏堡" loading="lazy"></figure>
+<p>“需求图给你，接好~”</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629685373211950000.png" alt="原型图" loading="lazy"></figure>
+<p>这个需求文档好像长得不太对劲？？？</p>
+<figure data-type="image" tabindex="3"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629685638506346000.jpeg" alt="熊猫头表情啊哈问号表情微信表情_搞笑微信表情_KanQQ个性网手机版" loading="lazy"></figure>
+<p>没办法了，那只能靠个人想象发挥了~</p>
+<p>正所谓“人靠衣装马靠鞍”，好看的UI框架是必不可少的。身为忠实阿里巴巴粉丝，始终坚信阿里巴巴出品必属精品！</p>
+<figure data-type="image" tabindex="4"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629686518798376000.gif" alt="Kapture 2021-08-23 at 10.41.25" loading="lazy"></figure>
+<p>最终我选择由阿里巴巴出品的<a href="https://chatui.io/">chatUI</a> (能满足项目中基本需求)作为我的前端UI组件，而后端则选择Go语言中Web框架<a href="https://github.com/gin-gonic/gin">gin</a></p>
+<h4 id="需求探讨">需求探讨</h4>
+<p>显然根据上文展示的需求文档进行一系列开发是不太现实的，这时就需要我们站起来和需求方进行深入交流(交流过程省略1万字。。。。自行脑补)</p>
+<figure data-type="image" tabindex="5"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629687146637175000.jpg" alt="理直气壮表情包" loading="lazy"></figure>
+<p>最终得出的需求有以下几点</p>
+<ol>
+<li>
+<p>机器人对话FQA(一问一答的方式)</p>
+</li>
+<li>
+<p>用户问题联想功能</p>
+</li>
+<li>
+<p>在线人工服务</p>
+</li>
+<li>
+<p>知识库浏览功能</p>
+</li>
+<li>
+<p>业务工单系统</p>
+</li>
+<li>
+<p>会话历史查询</p>
+<p><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629688839104599000.png" alt="image-20210823112037514" loading="lazy">																			机器人FQA基本流程图</p>
+</li>
+</ol>
+<h5 id="1-机器人对话fqa一问一答的方式">1、机器人对话FQA(一问一答的方式)</h5>
+<p>​	机器人对话FQA是什么呢？frequently asked questions的缩写，通俗的叫法“常见问题解答”。可以列出一些用户常见的问题，是一种在线帮助形式。</p>
+<figure data-type="image" tabindex="6"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629706586999420000.png" alt="image-20210823161625546" loading="lazy"></figure>
+<p>功能分析</p>
+<p>1、表明机器人可以做什么</p>
+<p>2、猜你想了解的</p>
+<p>3、输入文字则返回相应的数据</p>
+<h5 id="功能1表明机器人可以做什么">功能1（表明机器人可以做什么？）</h5>
+<p>​		实现起来超简单的，只要后端返回当前登录用户，以及登录时间，简述机器人的作用即可。这里不过多描述</p>
+<h5 id="功能2猜你想了解">功能2（猜你想了解）</h5>
+<p>​		根据需求分析，得到以下效果。</p>
+<p>用户所在场景分为两大类别：</p>
+<ol>
+<li>
+<p>飞书客户端(工作台)以及google谷歌浏览器</p>
+</li>
+<li>
+<p>公司内部系统嵌套</p>
+<p>大致流程如下：</p>
+<p>首先判断用户登录的地方，若是飞书登录。查询用户是否当天咨询过，如果咨询过则优先返回咨询过的数据，返回的数据条数不足10条，查询热门问题；否则 直接查询热门问题。若热门问题+咨询过的问题不足10条，则随机取；取到10条为止。</p>
+<p>用户咨询过的行为用户clickhouse表引擎MergeTree进行记录(用户行为不能修改，只用于添加和查询，因此为了降低MySQL的压力，使用clickhouse是最合适的选择)</p>
+</li>
+</ol>
+<figure data-type="image" tabindex="7"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629690354818717000.png" alt="image-20210823114553503" loading="lazy"></figure>
+<p>​																	猜你想了解流程图</p>
+<p>掀起袖子，开始撸代码</p>
+<pre><code class="language-go">// 1. 查询用户是否当天咨询过
+			ymd := fmt.Sprintf(&quot;%s-%s-%s 00:00:00&quot;, time.Now().Year(), time.Now().Month(), time.Now().Day())
+			stamp, _ := time.ParseInLocation(&quot;2006-01-02 15:04:05&quot;, ymd, time.Local)
+			rows, _ := config.G_clickhouse.Query(fmt.Sprintf(&quot;select content, count(content) As content_num from support_message where user_id = %d and create_time &gt; toDateTime(%d)  group by content order by content_num desc;&quot;, util.Int(checkExist[&quot;id&quot;]), util.Int(stamp.Unix())))
+
+			recommendList := make([]map[string]interface{}, 0)
+			existsList := make([]string, 0)
+			for rows.Next(){
+				// 如果recommendList的长度等于10就退出
+				if len(recommendList) == 10{
+					return
+				}
+				var (
+					content string
+					content_num int
+				)
+				if err := rows.Scan(&amp;content, &amp;content_num);err !=nil{
+					Self.Write_resp(c,1, &quot;clickhouse查询失败&quot;, &quot;&quot;)
+					return
+				}
+				recommendList = append(recommendList, map[string]interface{}{
+					&quot;title&quot;: content,
+				})
+				existsList = append(existsList, content)
+			}
+
+			// 1.1 如果当前的recommendList已经等于10，则不需要做任何操作
+			if len(recommendList) &lt; 10{
+				// 1.2 如果当前的recommendList小于10，则有两个逻辑(1.追加当天热门问题且不重复的 2.随机不重复的问题)
+				// 1.2.1 追加当天热门不重复问题
+				hots,_ := config.G_clickhouse.Query(fmt.Sprintf(&quot;select content, count(content) As content_num from support_message where create_time &gt; toDateTime(%d)  group by content order by content_num desc;&quot;, util.Int(stamp.Unix())))
+				for hots.Next(){
+          ... 执行追加逻辑
+				}
+				// 1.2.2 如果追加了当天热门不重复问题长度依然没有到长度10，则随机不重复问题了
+				if len(recommendList) &lt; 10{
+					// 随机获取推荐的10条信息
+					... 在mysql中获取10条随机不重复的数据
+				}
+			}
+</code></pre>
+<p>通过一系列操作之后，实现的效果如图所示：</p>
+<figure data-type="image" tabindex="8"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629706959472235000.png" alt="image-20210823162237465" loading="lazy"></figure>
+<p>​																		效果图</p>
+<p>数据优先级： 用户咨询过的 ----- 热门类型 ---- 随机</p>
+<h5 id="功能3输入文本返回相应的数据">功能3（输入文本返回相应的数据）</h5>
+<p>​		用户输入某个大概词语或者关键字，输出对应的关键词。</p>
+<p>由于小编这里快捷短语，联想输入和用户输入都是同一由前端send函数调用，因此没有对动作行为进行区分开。若要达到较好的用户体验，则需要对思路进行梳理。</p>
+<p>具体实现思路：</p>
+<figure data-type="image" tabindex="9"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629699066533556000.png" alt="image-20210823141105038" loading="lazy"></figure>
+<p>具体的代码就不放出来，代码量较多。。</p>
+<h5 id="2-用户问题联想功能关键词自动补全-自动纠正">2、用户问题联想功能（关键词自动补全 ，自动纠正）</h5>
+<p>作为资深google搜索的用户，常常感叹google的问题联想是怎么实现的？怎么这么牛逼的呢</p>
+<figure data-type="image" tabindex="10"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629701004314531000.gif" alt="Kapture 2021-08-23 at 14.41.03" loading="lazy"></figure>
+<p>经过多次查询资料后得出，实现类似功能。可以通过使用elasticsearch中的建议器(<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html">completion suggester</a>)进行实现。</p>
+<p>于是掀起袖子，开始撸代码啦~~~~</p>
+<p>首先创建索引名为support_konwledege_index</p>
+<pre><code class="language-shell">PUT http://xxx.xxx.xxx.xxx/support_konwledege_index/
+{
+	&quot;settings&quot;: {
+		&quot;number_of_shards&quot;: &quot;1&quot;,
+		&quot;index.refresh_interval&quot;: &quot;15s&quot;,
+		&quot;index&quot;: {
+			&quot;analysis&quot;: {
+				&quot;analyzer&quot;: {
+					&quot;default&quot;: {
+						&quot;tokenizer&quot;: &quot;ik_max_word&quot;
+					},
+					&quot;pinyin_analyzer&quot;: {
+						&quot;tokenizer&quot;: &quot;shopmall_pinyin&quot;
+					},
+					&quot;first_py_letter_analyzer&quot;: {
+						&quot;tokenizer&quot;: &quot;first_py_letter&quot;
+					},
+					&quot;full_pinyin_letter_analyzer&quot;: {
+						&quot;tokenizer&quot;: &quot;full_pinyin_letter&quot;
+					},
+          &quot;ik_pinyin_analyzer&quot;:{
+          &quot;tokenizer&quot;:&quot;ik_smart&quot;
+          }
+				},
+				&quot;tokenizer&quot;: {
+					&quot;shopmall_pinyin&quot;: ... 语法分析器根据索引进行配置即可,
+					&quot;first_py_letter&quot;: ... 同上,
+					&quot;full_pinyin_letter&quot;: {
+						&quot;type&quot;: &quot;pinyin&quot;,
+						&quot;keep_separate_first_letter&quot;: false,
+						&quot;keep_full_pinyin&quot;: false,
+						&quot;keep_original&quot;: false,
+						&quot;limit_first_letter_length&quot;: 16,
+						&quot;lowercase&quot;: true,
+						&quot;keep_first_letter&quot;: false,
+						&quot;keep_none_chinese_in_first_letter&quot;: false,
+						&quot;none_chinese_pinyin_tokenize&quot;: false,
+						&quot;keep_none_chinese&quot;: true,
+						&quot;keep_joined_full_pinyin&quot;: true,
+						&quot;keep_none_chinese_in_joined_full_pinyin&quot;: true
+					}
+				}
+			}
+		}
+	}
+}
+</code></pre>
+<p>index.refresh_interval  执行刷新操作的频率，这使得索引的最近更改对搜索可见。默认为<code>1s</code>. 可以设置<code>-1</code>为禁用刷新。如果未明确设置此设置，则至少<code>index.search.idle.after</code>几秒钟内未看到搜索流量的分片将不会收到后台刷新，直到它们收到搜索请求。命中空闲分片的搜索将等待下一次后台刷新（在 内<code>1s</code>）。此行为旨在在不执行搜索的默认情况下自动优化批量索引。为了选择退出此行为，<code>1s</code>应将的显式值设置为刷新间隔。(由于数据不需要那么实时更新和缓解后台压力，因此设置15s是完全够的)</p>
+<p>定义Ik分词器以及pinyin分词器</p>
+<p>完成以上操作，索引已经创建完成了，剩下需要创建map映射了</p>
+<pre><code class="language-shell">PUT http://xxx.xxx.xxx.xxx/support_konwledege_index/_mapping/konwledege_type?include_type_name=true
+{
+	&quot;properties&quot;: {
+		&quot;title&quot;: {
+			&quot;type&quot;: &quot;completion&quot;,
+			&quot;fields&quot;: {
+				&quot;pinyin&quot;: {
+                    &quot;type&quot;: &quot;completion&quot;,
+                    &quot;analyzer&quot;: &quot;pinyin_analyzer&quot;,
+                    &quot;preserve_separators&quot;: false
+                },
+                &quot;keyword_pinyin&quot;: ...(配置可以到网上进行查询)
+                &quot;keyword_first_py&quot;: ...(配置可以到网上进行查询)
+                &quot;my_pinyin&quot;:{
+                    &quot;type&quot;:&quot;completion&quot;,
+                    &quot;analyzer&quot;: &quot;ik_pinyin_analyzer&quot;,
+                    &quot;preserve_separators&quot;: false
+                }
+			}
+		}
+	}
+}
+</code></pre>
+<p>preserve_separators 保留分隔符，默认为<code>true</code>. 如果禁用，您可以找到一个以 开头的字段<code>Foo Fighters</code>。可以通过foof 查找，一般这里设置成false即可。</p>
+<p>完成上面的操作后，索引，map都创建好了，只需导入数据即可。</p>
+<p>接下来对elasticsearch进行搜索，看代码：</p>
+<pre><code class="language-shell">GET http://xxx.xxx.xxx.xxx/support_konwledege_index/konwledege_type/_search?pretty
+{
+  &quot;_source&quot;: &quot;title&quot;,
+  &quot;suggest&quot;: {
+    &quot;match&quot;: {
+      &quot;text&quot;: &quot;什么事&quot;,
+      &quot;completion&quot;: {
+        &quot;field&quot;: &quot;title&quot;,
+        &quot;size&quot;: 5,
+        &quot;fuzzy&quot;: {
+            &quot;fuzziness&quot;: &quot;AUTO&quot;,
+            &quot;min_length&quot;: 3,
+            &quot;prefix_length&quot;: 2,
+            &quot;unicode_aware&quot;: true
+        }
+        // &quot;skip_duplicates&quot;:true
+      }
+    }
+  }
+}
+
+结果：
+{
+    &quot;took&quot;: 6,
+    &quot;timed_out&quot;: false,
+    &quot;_shards&quot;:...,
+    &quot;hits&quot;: ...,
+    &quot;suggest&quot;: {
+        &quot;match&quot;: [
+            {
+                &quot;text&quot;: &quot;什么事&quot;,
+                &quot;offset&quot;: 0,
+                &quot;length&quot;: 3,
+                &quot;options&quot;: [
+                    {
+                        &quot;text&quot;: &quot;什么是回源HOST&quot;,
+                        &quot;_index&quot;: &quot;support_konwledege_index&quot;,
+                        &quot;_type&quot;: &quot;konwledege_type&quot;,
+                        &quot;_id&quot;: &quot;31&quot;,
+                        &quot;_score&quot;: 2.0,
+                        &quot;_source&quot;: {
+                            &quot;title&quot;: {
+                                &quot;input&quot;: &quot;什么是回源HOST&quot;,
+                                &quot;weight&quot;: 2
+                            }
+                        }
+                    },
+                    ...
+                ]
+            }
+        ]
+    }
+}
+</code></pre>
+<p>为什么我输入“什么事”，会搜索到”什么是XXX“这种标题呢？原因是fuzzy这个字段，elasticsearch官网中的解析是The completion suggester also supports fuzzy queries — this means you can have a typo in your search and still get results back. 简单的描述就是支持模糊查询，在搜索中输入拼写错误，但仍然可以返回结果。</p>
+<p>具体参数：</p>
+<table>
+<thead>
+<tr>
+<th><code>fuzziness</code></th>
+<th>The fuzziness factor, defaults to <code>AUTO</code>. See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.2/common-options.html#fuzziness">Fuzziness</a> for allowed settings.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transpositions</code></td>
+<td>if set to <code>true</code>, transpositions are counted as one change instead of two, defaults to <code>true</code></td>
+</tr>
+<tr>
+<td><code>min_length</code></td>
+<td>Minimum length of the input before fuzzy suggestions are returned, defaults <code>3</code></td>
+</tr>
+<tr>
+<td><code>prefix_length</code></td>
+<td>Minimum length of the input, which is not checked for fuzzy alternatives, defaults to <code>1</code></td>
+</tr>
+<tr>
+<td><code>unicode_aware</code></td>
+<td>If <code>true</code>, all measurements (like fuzzy edit distance, transpositions, and lengths) are measured in Unicode code points instead of in bytes. This is slightly slower than raw bytes, so it is set to <code>false</code> by default.</td>
+</tr>
+</tbody>
+</table>
+<p>图上代码主要设置了模糊因子为自动, <strong>fuzziness: Auto</strong>; <strong>min_length: 3</strong>, <strong>prefix_length：2</strong> , <strong>unicode_aware: true</strong> unicode_aware: 这个对字符进行Unicode 转换，由于我们大多数是中文，需要Unicode 编码的，否则min_length 和 prefix_length 的长度计算都不是以Unicode编码计算的。</p>
+<p>​		可能你也发现了_score评分参数和weight 是一样的~，是的。我对内容进行weight权重的控制，实现热门问题置顶的效果。(<strong>suggets默认搜索结果排序是按照数字大小、字母ASCII码、input索引到ES的顺序排序</strong>)</p>
+<p>根据上面的代码来进行操作已经完成了核心的功能，我们就往细节进行优化了~</p>
+<p>1、当用户输入关键词后，没有找到文章内容，相关问题应该返回热门问题，文章内容需要返回没有找到内容的语术。</p>
+<p>2、当用户输入关键词后，找到文章内容，但没有找到类似的问题(类似问题的寻找规律是<strong>关键词的长度 除以 2 形成新的关键词</strong>), 相关问题需要返回热门问题</p>
+<p>3、当用户输入关键词后，找到文章内容，权重需要发生变化</p>
+<p>4、用户多次搜索同一个标题，标题权重只会加1次</p>
+<h5 id="3-在线人工服务">3、在线人工服务</h5>
+<p>当机器人没有返回用户满意的答案时，人工接入称为解决用户问题的最终手段。</p>
+<p>想要实现较好的人工服务，必须有一个较好的架构服务。经过多方考量，得出人工服务架构如下：</p>
+<figure data-type="image" tabindex="11"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210714_1626231747056303000.png" alt="人工服务架构图" loading="lazy"></figure>
+<p>人工服务使用web端即时通讯技术，实现即时通讯方法在市面上普遍有4中方法</p>
+<p>1、轮询</p>
+<p>2、长轮询(comet)</p>
+<p>3、长连接</p>
+<p>4、websocket</p>
+<p>具体的优缺点，我在此就不一一分析。项目中采用的是websocket协议进行通信的。</p>
+<p>1.既然采用websocket协议，所以需要对原有的http协议进行升级改造(这里使用github.com/gorilla/websocket)</p>
+<pre><code class="language-go">// 升级get请求为websocket协议
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		return
+	}
+	client := &amp;Client{Conn: ws, Send: make(chan []byte, 256), UserInfo: nil}
+</code></pre>
+<p>2.订阅协程kafka消费者</p>
+<pre><code class="language-go">go client.Consumer()
+
+func (c *Client) Consumer() {
+	consumer, err := sarama.NewConsumer(config.GlobalConfig.Support.Kafka.Host, nil)
+	if err != nil {
+		logs.Error(&quot;kafka 失败&quot;, err)
+		return
+	}
+	// 程序运行结束时，调用Close关闭消费者对象
+	defer func() {
+		if err := consumer.Close(); err != nil {
+			log.Printf(&quot;消费者关闭&quot;)
+			return
+		}
+	}()
+
+	fmt.Printf(&quot;====================开启消费者通道：%s===================== \n&quot;, c.UserInfo.OpenId)
+
+	// 创建消费者对象管理的分区消费者对象
+	partitionConsumer, err := consumer.ConsumePartition(c.UserInfo.OpenId, 0, sarama.OffsetNewest)
+	if err != nil {
+		logs.Error(&quot;kafka创建分区失败&quot;, err)
+	}
+
+	defer func() {
+		if err := partitionConsumer.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
+	
+	for message := range partitionConsumer.Messages() {
+		res := map[string]interface{}{}
+		json.Unmarshal(message.Value, &amp;res)
+		c.Conn.WriteJSON(res)
+	}
+}
+</code></pre>
+<p>根据上面代码，可以理解成每个用户都是一个信箱，每当有消息来的时候，需要对用户的信箱进行写入(这就是写扩散，因为小助手群聊人数一般不会超过5个人，因此写扩散带来的性能问题可以忽略不计，但逻辑却可以带来极大便利)</p>
+<figure data-type="image" tabindex="12"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210714_1626231751000763000.png" alt="消息转发流程" loading="lazy"></figure>
+<p>一套消息转发就这样简单实现了~接下来对消息类型进行不同逻辑处理(如下图所示)</p>
+<figure data-type="image" tabindex="13"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210714_1626231756075069000.png" alt="消息类型" loading="lazy"></figure>
+<p>消息类型分为8大类型</p>
+<ul>
+<li>
+<p>ping</p>
+</li>
+<li>
+<p>cmd</p>
+</li>
+<li>
+<p>session_all</p>
+</li>
+<li>
+<p>file</p>
+</li>
+<li>
+<p>callback</p>
+</li>
+<li>
+<p>calc_session</p>
+</li>
+<li>
+<p>text</p>
+</li>
+<li>
+<p>image</p>
+</li>
+</ul>
+<p><strong>ping</strong> 类型的消息 用于前端维护websocket的心跳机制，前端发送ping的内容，若后端接收到ping消息会返回前端pong消息，若前端没有接收到后端返回的pong消息，则会采用阶梯式发送ping 消息。阶梯式档位一般分为(30s 1分钟 5分钟 直接断开)</p>
+<p><strong>cmd</strong> 类型的消息 用于系统类型消息。我这里用于退出会话(主要因为小助手是属于客服对话，用户咨询完，会话不必显示在当前列表中，会话状态设置为关闭)</p>
+<p><strong>session_all</strong> 类型的消息 用于用户或者管理员点开新的会话，从而获取当前会话的所有聊天记录(由于会话不会一直不变和聊天内容不会很多，所以不需要采用分页的形式)</p>
+<p><strong>file</strong> 类型的消息 用于用户或管理员发送文件消息(消息里面有url, size, name)</p>
+<p><strong>callback</strong> 类型的消息 用于管理员或者用户不小心发送错了消息，可以有撤回的机会</p>
+<p><strong>calc_session</strong> 类型的消息 用于实时计算会话列表，用于有新的消息到来，会话置顶。未读消息，未读计数+1等等</p>
+<p><strong>text</strong> 类型的消息 用于管理员或用户 发送文字</p>
+<p><strong>image</strong> 类型的消息 用于用户或者管理员发送图片消息(消息里面有url, size, name)</p>
+<p>根据上面的架构以及分析，是时候撸代码了</p>
+<pre><code class="language-go">func (c *Client) Read() {
+	defer func() {
+		c.Conn.Close()
+	}()
+
+	for {
+		_, message, err := c.Conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf(&quot;error : %v&quot;, err)
+			}
+			break
+		}
+		messageHandler := util.MapStr(message)
+		if messageHandler[&quot;type&quot;] == &quot;ping&quot; {
+			// 向kafka中发送消息
+			Producer(c.UserInfo.OpenId, map[string]interface{}{
+				&quot;type&quot;: &quot;pong&quot;,
+			})
+		} else if messageHandler[&quot;type&quot;] == &quot;cmd&quot; {
+			if util.MapStr(messageHandler[&quot;content&quot;])[&quot;code&quot;] == &quot;sub&quot; {
+				c.GetGroupList()
+			} else if util.MapStr(messageHandler[&quot;content&quot;])[&quot;code&quot;] == &quot;agent_leave&quot; {
+				c.AgentLeave(messageHandler)
+			}
+		} else if messageHandler[&quot;type&quot;] == &quot;session_all&quot; {
+			c.GetSessionMsg(messageHandler)
+		} else if messageHandler[&quot;type&quot;] == &quot;callback&quot; {
+			c.CallBackMsg(messageHandler)
+		} else if messageHandler[&quot;type&quot;] == &quot;calc_session&quot; {
+			c.GetSessionList()
+		} else {
+			c.SendMsg(messageHandler)
+		}
+	}
+}
+</code></pre>
+<p>以上就是运维小助手后端设计方案以及核心思路。</p>
+<p>功能4,5,6都属于普普通通的web开发功能，我就不一一讲解啦。</p>
+<p>最后带大家来康康成品后的效果叭~</p>
+<p>用户界面：</p>
+<figure data-type="image" tabindex="14"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629705876474137000.gif" alt="894da461ff24dd7a44090b8bb4621969" loading="lazy"></figure>
+<p>管理员界面：</p>
+<figure data-type="image" tabindex="15"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20210823_1629706871387552000.gif" alt="Kapture 2021-08-23 at 16.18.04" loading="lazy"></figure>
+<h2 id="后记">后记</h2>
+<p>市面上有很多优秀的开源客服系统，但定位都各有千秋。市面上的开源客服系统不能一一满足我们的需求。复杂的定制逻辑以及应用场景都需要定制开发，但是受到产品本身的语言或者框架的局限性，导致使用困难，维护成本较高，折腾半天发现还不如自己弄一个。在线客服系统我们已经向前迈进了一步。后面的路怎么走，或许还需要更多的探索。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+
+        
+
+        
+            
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js"></script>
+<script>
+    // md5.min.js
+    !function(n){
+        "use strict";
+        function d(n,t){var r=(65535&n)+(65535&t);return(n>>16)+(t>>16)+(r>>16)<<16|65535&r}
+        function f(n,t,r,e,o,u){return d((c=d(d(t,n),d(e,u)))<<(f=o)|c>>>32-f,r);var c,f}
+        function l(n,t,r,e,o,u,c){return f(t&r|~t&e,n,t,o,u,c)}
+        function v(n,t,r,e,o,u,c){return f(t&e|r&~e,n,t,o,u,c)}
+        function g(n,t,r,e,o,u,c){return f(t^r^e,n,t,o,u,c)}
+        function m(n,t,r,e,o,u,c){return f(r^(t|~e),n,t,o,u,c)}
+        function i(n,t){var r,e,o,u,c;n[t>>5]|=128<<t%32,n[14+(t+64>>>9<<4)]=t;var f=1732584193,i=-271733879,a=-1732584194,h=271733878;for(r=0;r<n.length;r+=16)f=l(e=f,o=i,u=a,c=h,n[r],7,-680876936),h=l(h,f,i,a,n[r+1],12,-389564586),a=l(a,h,f,i,n[r+2],17,606105819),i=l(i,a,h,f,n[r+3],22,-1044525330),f=l(f,i,a,h,n[r+4],7,-176418897),h=l(h,f,i,a,n[r+5],12,1200080426),a=l(a,h,f,i,n[r+6],17,-1473231341),i=l(i,a,h,f,n[r+7],22,-45705983),f=l(f,i,a,h,n[r+8],7,1770035416),h=l(h,f,i,a,n[r+9],12,-1958414417),a=l(a,h,f,i,n[r+10],17,-42063),i=l(i,a,h,f,n[r+11],22,-1990404162),f=l(f,i,a,h,n[r+12],7,1804603682),h=l(h,f,i,a,n[r+13],12,-40341101),a=l(a,h,f,i,n[r+14],17,-1502002290),f=v(f,i=l(i,a,h,f,n[r+15],22,1236535329),a,h,n[r+1],5,-165796510),h=v(h,f,i,a,n[r+6],9,-1069501632),a=v(a,h,f,i,n[r+11],14,643717713),i=v(i,a,h,f,n[r],20,-373897302),f=v(f,i,a,h,n[r+5],5,-701558691),h=v(h,f,i,a,n[r+10],9,38016083),a=v(a,h,f,i,n[r+15],14,-660478335),i=v(i,a,h,f,n[r+4],20,-405537848),f=v(f,i,a,h,n[r+9],5,568446438),h=v(h,f,i,a,n[r+14],9,-1019803690),a=v(a,h,f,i,n[r+3],14,-187363961),i=v(i,a,h,f,n[r+8],20,1163531501),f=v(f,i,a,h,n[r+13],5,-1444681467),h=v(h,f,i,a,n[r+2],9,-51403784),a=v(a,h,f,i,n[r+7],14,1735328473),f=g(f,i=v(i,a,h,f,n[r+12],20,-1926607734),a,h,n[r+5],4,-378558),h=g(h,f,i,a,n[r+8],11,-2022574463),a=g(a,h,f,i,n[r+11],16,1839030562),i=g(i,a,h,f,n[r+14],23,-35309556),f=g(f,i,a,h,n[r+1],4,-1530992060),h=g(h,f,i,a,n[r+4],11,1272893353),a=g(a,h,f,i,n[r+7],16,-155497632),i=g(i,a,h,f,n[r+10],23,-1094730640),f=g(f,i,a,h,n[r+13],4,681279174),h=g(h,f,i,a,n[r],11,-358537222),a=g(a,h,f,i,n[r+3],16,-722521979),i=g(i,a,h,f,n[r+6],23,76029189),f=g(f,i,a,h,n[r+9],4,-640364487),h=g(h,f,i,a,n[r+12],11,-421815835),a=g(a,h,f,i,n[r+15],16,530742520),f=m(f,i=g(i,a,h,f,n[r+2],23,-995338651),a,h,n[r],6,-198630844),h=m(h,f,i,a,n[r+7],10,1126891415),a=m(a,h,f,i,n[r+14],15,-1416354905),i=m(i,a,h,f,n[r+5],21,-57434055),f=m(f,i,a,h,n[r+12],6,1700485571),h=m(h,f,i,a,n[r+3],10,-1894986606),a=m(a,h,f,i,n[r+10],15,-1051523),i=m(i,a,h,f,n[r+1],21,-2054922799),f=m(f,i,a,h,n[r+8],6,1873313359),h=m(h,f,i,a,n[r+15],10,-30611744),a=m(a,h,f,i,n[r+6],15,-1560198380),i=m(i,a,h,f,n[r+13],21,1309151649),f=m(f,i,a,h,n[r+4],6,-145523070),h=m(h,f,i,a,n[r+11],10,-1120210379),a=m(a,h,f,i,n[r+2],15,718787259),i=m(i,a,h,f,n[r+9],21,-343485551),f=d(f,e),i=d(i,o),a=d(a,u),h=d(h,c);return[f,i,a,h]}
+        function a(n){var t,r="",e=32*n.length;for(t=0;t<e;t+=8)r+=String.fromCharCode(n[t>>5]>>>t%32&255);return r}
+        function h(n){var t,r=[];for(r[(n.length>>2)-1]=void 0,t=0;t<r.length;t+=1)r[t]=0;var e=8*n.length;for(t=0;t<e;t+=8)r[t>>5]|=(255&n.charCodeAt(t/8))<<t%32;return r}
+        function e(n){var t,r,e="0123456789abcdef",o="";for(r=0;r<n.length;r+=1)t=n.charCodeAt(r),o+=e.charAt(t>>>4&15)+e.charAt(15&t);return o}
+        function r(n){return unescape(encodeURIComponent(n))}
+        function o(n){return a(i(h(t=r(n)),8*t.length));var t}
+        function u(n,t){return function(n,t){var r,e,o=h(n),u=[],c=[];for(u[15]=c[15]=void 0,16<o.length&&(o=i(o,8*n.length)),r=0;r<16;r+=1)u[r]=909522486^o[r],c[r]=1549556828^o[r];return e=i(u.concat(h(t)),512+8*t.length),a(i(c.concat(e),640))}(r(n),r(t))}
+        function t(n,t,r){return t?r?u(t,n):e(u(t,n)):r?o(n):e(o(n))}
+        "function"==typeof define&&define.amd?define(function(){return t}):"object"==typeof module&&module.exports?module.exports=t:n.md5=t;
+    }(this);
+</script>
+
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '',
+    clientSecret: '',
+    repo: '',
+    owner: '',
+    admin: [''],
+    id: md5(location.pathname),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false       // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+            
+
+            
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">记录运维开发中出现的问题</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by 
+<a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<br><br>
+Copyright 2021 &copy 
+<a href="https://twitter.com/mei_samson" target="_blank">
+<span style="color:blue">lpb</span></a>
+<br><br>
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="blank">
+<span style="color:orange">本博客采用 CC BY-NC-SA 4.0 进行许可</span></a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://a1733452028.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.highlightAll()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

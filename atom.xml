@@ -1,0 +1,2397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://a1733452028.github.io</id>
+    <title>PbRcord</title>
+    <updated>2022-06-27T02:02:35.169Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://a1733452028.github.io"/>
+    <link rel="self" href="https://a1733452028.github.io/atom.xml"/>
+    <subtitle>记录运维开发中出现的问题</subtitle>
+    <logo>https://a1733452028.github.io/images/avatar.png</logo>
+    <icon>https://a1733452028.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, PbRcord</rights>
+    <entry>
+        <title type="html"><![CDATA[前端虚拟滚动列表推荐]]></title>
+        <id>https://a1733452028.github.io/post/qian-duan-xu-ni-gun-dong-lie-biao-tui-jian/</id>
+        <link href="https://a1733452028.github.io/post/qian-duan-xu-ni-gun-dong-lie-biao-tui-jian/">
+        </link>
+        <updated>2022-06-27T02:01:08.000Z</updated>
+        <content type="html"><![CDATA[<p>https://virtuoso.dev/<br>
+<img src="https://a1733452028.github.io/post-images/1656295314757.svg" alt="" loading="lazy"><br>
+炒鸡好用！！！！！！</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[webpack5配置过程]]></title>
+        <id>https://a1733452028.github.io/post/webpack5-pei-zhi-guo-cheng/</id>
+        <link href="https://a1733452028.github.io/post/webpack5-pei-zhi-guo-cheng/">
+        </link>
+        <updated>2022-06-14T11:01:35.000Z</updated>
+        <content type="html"><![CDATA[<p>[TOC]</p>
+<h3 id="一-概念">一、概念</h3>
+<p>从本质上讲，<strong>webpack</strong>是现代 JavaScript 应用程序的<em>静态模块打包器。<em>当 webpack 处理您的应用程序时，它会在内部从一个或多个</em>入口点</em>构建一个<a href="https://webpack.js.org/concepts/dependency-graph/">依赖关系图</a>，然后将您项目所需的每个模块组合成一个或多个<em>bundles</em>，这些 bundles 是用于提供内容的静态资产。</p>
+<h3 id="二-入口">二、入口</h3>
+<p>在某个文件中创建名为webpack5的文件夹, 然后执行package.json初始化命令（全程回车）</p>
+<pre><code class="language-shell">mkdir webpack5 &amp;&amp; cd webpack5
+</code></pre>
+<pre><code class="language-shell">yarn init
+</code></pre>
+<p>创建名为config的文件夹（用于存放webpack5的配置文件）</p>
+<pre><code class="language-shell">mkdir config
+</code></pre>
+<p>主要存放三个文件: webpack 公共资源部分，webpack dev开发环境部分, webpack build 打包环境部分</p>
+<pre><code class="language-shell">cd config
+</code></pre>
+<pre><code class="language-shell"># 创建webpack 公共资源部分
+touch webpack.public.js
+# webpack dev开发环境部分
+touch webpack.development.js
+#  webpack build 打包环境部分
+touch webpack.product.js
+</code></pre>
+<p>创建webpack入口文件, 入口文件存放到根目录的src里面。而src目录不存在，需要我们创建</p>
+<pre><code class="language-shell">cd .. &amp;&amp; mkdir src
+</code></pre>
+<pre><code class="language-shell">cd src &amp;&amp; touch index.js
+</code></pre>
+<p>完成以上创建文件以及文件夹准备工作之后，需要安装webpack。(以下附上当前代码的目录结构, node_modules和 yarn-error.log可以忽略)</p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220613152118805.png" alt="image-20220613152118805" loading="lazy"></figure>
+<h3 id="三-安装">三、安装</h3>
+<p>回到项目的根目录，我们需要安装webpack以及webpack-cli</p>
+<pre><code class="language-shell">cd ..
+</code></pre>
+<pre><code class="language-shell">yarn add webpack webpack-cli -D
+</code></pre>
+<p>出现以下截图即代表安装成功</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220613152052628.png" alt="image-20220613152052628" loading="lazy"></figure>
+<h3 id="四-使用reactjavascript-react">四、使用React+JavaScript React</h3>
+<pre><code class="language-shell">yarn add react react-dom -D
+</code></pre>
+<p>安装成功后，目前项目是无法识别的React语法jsx的内容，因此需要在webpack.public.js中添加匹配规则，告诉webpack遇到这个文件我们应该使用什么解析器去解读这类文件，webpack5中使用babel-loader是可以完成的，但本次文档中使用esbuild-loader来进行编译。（具体原因：esbuild-loader是使用go进行编译的，而babel-loader是调用JavasScript进行编译的，从语言的角度上来说，Go是比JavaScript快的，因此esbuild-loader编译出来的速度是比babel-loader快）<a href="https://github.com/privatenumber/esbuild-loader">esbuild-loader的详细介绍点击这里</a></p>
+<pre><code class="language-shell">yarn add esbuild-loader -D
+</code></pre>
+<p>在config文件夹中新创建一个paths.js文件(用于封装路径方法)</p>
+<pre><code class="language-shell">cd config &amp;&amp; touch paths.js
+</code></pre>
+<p>paths.js的内容</p>
+<pre><code class="language-javascript">const fs = require('fs')
+const path = require('path')
+
+const appDirectory = fs.realpathSync(process.cwd());
+const resolveApp = relativePath =&gt; path.resolve(appDirectory, relativePath);
+
+module.exports = {
+  resolveApp
+}
+</code></pre>
+<p>添加webpack入口文件</p>
+<p>编写webpack.public.js 文件</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+
+
+module.exports = {
+    entry: [
+        path.resolveApp(&quot;src/index.js&quot;)
+    ]
+}
+</code></pre>
+<p>编写webpack输出文件，而开发环境中是需要追求构建效率，因此需要缓存策略来加快；而线上却需要更新完后，用户能够立马看到效果。因此需要contenthash来进行区分。</p>
+<p>针对线上和开发环境中可能出现的两种不同情况来考虑，我们需要通过合并公共部分，然后定义不同的规则来实现，因此webpack-merge很符合我们的需求。<a href="https://github.com/survivejs/webpack-merge">webpack-merge的详细说明</a></p>
+<pre><code class="language-shell">yarn add webpack-merge -D
+</code></pre>
+<p>修改webpack.development.js的内容</p>
+<pre><code class="language-javascript">const common = require(&quot;./webpack.public.js&quot;)
+const {merge} = require(&quot;webpack-merge&quot;)
+const path = require(&quot;./paths.js&quot;)
+
+module.exports = merge(common, {
+    mode: &quot;development&quot;,
+    output: {
+        filename: &quot;[name].bundle.js&quot;,
+        clean: true,
+        path: path.resolveApp(&quot;dist&quot;)
+    }
+})
+</code></pre>
+<p>修改webpack.product.js</p>
+<pre><code class="language-shell">const common = require(&quot;./webpack.public.js&quot;)
+const {merge} = require(&quot;webpack-merge&quot;)
+const path = require(&quot;./paths.js&quot;)
+
+module.exports = merge(common, {
+    mode: &quot;production&quot;,
+    output: {
+        filename: &quot;[name].[contenthash].bundle.js&quot;,
+        clean: true,
+        path: path.resolveApp(&quot;dist&quot;)
+    }
+})
+</code></pre>
+<p>编写Webpack 匹配jsx,js的规则，由于开发环境和生成环境无需做区分，因此在webpack.public.js中进行编写</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+
+
+module.exports = {
+  entry: [
+    path.resolveApp(&quot;src/index.js&quot;)
+  ],
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      include: [path.resolveApp(&quot;src&quot;)],
+      exclude: [path.resolveApp(&quot;node_modules&quot;)],
+      user: [
+        {
+          loader: &quot;babel-loader&quot;
+        }
+      ]
+    }]
+  }
+}
+</code></pre>
+<p>细心的朋友可能会发现，代码中是没有使用esbuild-loader,而是使用了babel-loader。这次更替的原因是babel-loader可以支持很多很好用的插件，比如问号表达式，antd按需导入css等等。esbuild-loader目前是没有支持以上的插件，因此需要使用babel-loader</p>
+<pre><code class="language-shell">yarn add babel-loader -D
+</code></pre>
+<p>在config文件夹下创建babel.config.js文件</p>
+<pre><code class="language-shell">touch babel.config.js
+</code></pre>
+<p>babel.config.js文件的内容</p>
+<pre><code class="language-javascript">module.exports = {
+  presets: [
+    [&quot;@babel/preset-env&quot;, {                                       // 配置packages.json的browserlist针对指定浏览器版本做适配
+      useBuiltIns: false,
+      modules: false
+    }],
+    &quot;@babel/preset-react&quot;                                         // 将React代码转换成es5
+  ],
+  plugins: [
+    [&quot;@babel/plugin-transform-runtime&quot;, {                          // 转译代码
+      &quot;corejs&quot;: 3
+    }],
+    &quot;@babel/plugin-proposal-nullish-coalescing-operator&quot;,         // 问号??的用法
+    &quot;@babel/plugin-proposal-optional-chaining&quot;,                   // 问号?.的用法
+    [&quot;@babel/plugin-proposal-decorators&quot;, {
+      legacy: true
+    }],                                                           // 解析装饰器 dva中的@connect
+    [&quot;@babel/plugin-proposal-class-properties&quot;, {
+      legacy: true
+    }],                                                           // 转换类中某些属性 ** 注意：@babel/plugin-proposal-decorators 和 @babel/plugin-proposal-class-properties要保持这样。
+    &quot;babel-plugin-inline-react-svg&quot;,                              // 将svg 导出React组件
+    [&quot;babel-plugin-import&quot;, {
+      libraryName: 'antd',
+      libraryDirectory: 'es',
+      style: true
+    }],                                                           // 导入组件的时候，顺带导入样式
+  ]
+}
+</code></pre>
+<p>需要安装一下的包</p>
+<pre><code class="language-shell">yarn add @babel/preset-env -D
+yarn add @babel/preset-react -D
+yarn add @babel/plugin-transform-runtime -D
+yarn add @babel/runtime-corejs3 -D
+yarn add @babel/plugin-proposal-nullish-coalescing-operator -D
+yarn add @babel/plugin-proposal-optional-chaining -D 
+yarn add @babel/plugin-proposal-decorators -D 
+yarn add @babel/plugin-proposal-class-properties -D
+yarn add babel-plugin-inline-react-svg -D
+yarn add babel-plugin-import -D
+yarn add @babel/core -D
+</code></pre>
+<p>安装完成后，修改一下webpack.public.js的babel-loader规则</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+const babelOptions = require(&quot;./babel.config.js&quot;)
+
+module.exports = {
+  entry: [
+    path.resolveApp(&quot;./src/index.js&quot;)
+  ],
+  resolve:{
+    extensions: [&quot;.jsx&quot;, &quot;.js&quot;, &quot;.json&quot;] // 无需后缀即可完成导入
+  },
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      include: [path.resolveApp(&quot;src&quot;)],
+      exclude: [path.resolveApp(&quot;node_modules&quot;)],
+      use: [
+        {
+          loader: &quot;babel-loader&quot;,
+          options: babelOptions
+        }
+      ]
+    }]
+  }
+}
+</code></pre>
+<p>我们需要在开发环境中看到效果，因此需要安装webpack-dev-server这个开发服务器。</p>
+<pre><code class="language-shell">yarn add webpack-dev-server -D
+</code></pre>
+<p>修改webpack.development.js文件</p>
+<pre><code class="language-javascript">const common = require(&quot;./webpack.public.js&quot;)
+const {merge} = require(&quot;webpack-merge&quot;)
+const path = require(&quot;./paths.js&quot;)
+
+module.exports = merge(common, {
+    mode: &quot;development&quot;,
+    output: {
+        filename: &quot;[name].bundle.js&quot;,
+        clean: true,
+        path: path.resolveApp(&quot;dist&quot;)
+    },
+    devServer: {
+        host: &quot;0.0.0.0&quot;,
+        port: 3000,
+        compress: true,             // 开启服务器gzip压缩
+        open: false,
+        historyApiFallback: true,   // 提供页面来替代404响应
+        hot: &quot;only&quot;,                // 构建失败的情况下启动热模块替代而不是刷新页面
+    }
+})
+</code></pre>
+<p>通过node 命令来启动服务器查看效果</p>
+<p>修改根目录下的package.json文件</p>
+<pre><code class="language-javascript">{
+  &quot;name&quot;: &quot;webpack5&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;main&quot;: &quot;index.js&quot;,
+  &quot;license&quot;: &quot;MIT&quot;,
+  &quot;scripts&quot;: {
+    &quot;dev&quot;: &quot;webpack-dev-server --config config/webpack.development.js&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;@babel/core&quot;: &quot;^7.18.5&quot;,
+    &quot;@babel/plugin-proposal-class-properties&quot;: &quot;^7.17.12&quot;,
+    &quot;@babel/plugin-proposal-decorators&quot;: &quot;^7.18.2&quot;,
+    &quot;@babel/plugin-proposal-optional-chaining&quot;: &quot;^7.17.12&quot;,
+    &quot;@babel/plugin-transform-runtime&quot;: &quot;^7.18.5&quot;,
+    &quot;@babel/preset-env&quot;: &quot;^7.18.2&quot;,
+    &quot;@babel/preset-react&quot;: &quot;^7.17.12&quot;,
+    &quot;@babel/runtime-corejs3&quot;: &quot;^7.18.3&quot;,
+    &quot;babel-loader&quot;: &quot;^8.2.5&quot;,
+    &quot;babel-plugin-import&quot;: &quot;^1.13.5&quot;,
+    &quot;babel-plugin-inline-react-svg&quot;: &quot;^2.0.1&quot;,
+    &quot;esbuild-loader&quot;: &quot;^2.19.0&quot;,
+    &quot;react&quot;: &quot;^18.1.0&quot;,
+    &quot;react-dom&quot;: &quot;^18.1.0&quot;,
+    &quot;webpack&quot;: &quot;^5.73.0&quot;,
+    &quot;webpack-cli&quot;: &quot;^4.10.0&quot;,
+    &quot;webpack-dev-server&quot;: &quot;^4.9.2&quot;,
+    &quot;webpack-merge&quot;: &quot;^5.8.0&quot;
+  }
+}
+</code></pre>
+<p>然后在终端敲</p>
+<pre><code class="language-shell">yarn dev
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220613190620925.png" alt="image-20220613190620925" loading="lazy"></figure>
+<p>出现以上内容，即为成功。</p>
+<p>现在我们访问http://localhost:3000/是没有任何效果的。</p>
+<p>因此我们需要对src/index.js进行改造</p>
+<pre><code class="language-javascript">// index.js
+import React from &quot;react&quot;;
+import {createRoot} from &quot;react-dom/client&quot;
+
+
+function HelloMessage({name}){
+    return &lt;div&gt;Hello {name}&lt;/div&gt;
+}
+
+
+const root = createRoot(
+    document.getElementById(&quot;root&quot;)
+)
+root.render(&lt;HelloMessage name={&quot;Bob&quot;}/&gt;)
+
+</code></pre>
+<p>通过之前对React-dom的学习以及了解，解读代码就知道React需要将DOM节点挂载到id=&quot;root&quot;的元素上。</p>
+<p>因此，我们需要一个html的模板，进入src目录中</p>
+<pre><code class="language-she">-&gt; pwd
+/Users/liangpingbo/Desktop/个人/前端/webpack/webpack5
+cd src
+touch index.html
+</code></pre>
+<p>index.html的内容如下</p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;!-- &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt; --&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;renderer&quot; content=&quot;webkit&quot;&gt;
+    &lt;title&gt;&lt;%= htmlWebpackPlugin.options.title %&gt;&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;&lt;%= htmlWebpackPlugin.options.mountRoot %&gt;&quot; style=&quot;height: 100%;&quot;&gt;&lt;/div&gt;
+    &lt;/script&gt;
+ &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>仔细观察，就会发现id 并没有写死，而是通过一个插件进行动态传递的。</p>
+<p>这时我们就需要安装一个插件</p>
+<pre><code class="language-shell">  yarn add --dev html-webpack-plugin
+</code></pre>
+<p>我们需要对webpack.public.js的内容进行修改</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+const babelOptions = require(&quot;./babel.config.js&quot;)
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
+  entry: [
+    path.resolveApp(&quot;./src/index.js&quot;)
+  ],
+  resolve: {
+    extensions: [&quot;.jsx&quot;, &quot;.js&quot;, &quot;.json&quot;] // 无需后缀即可完成导入
+  },
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      include: [path.resolveApp(&quot;src&quot;)],
+      exclude: [path.resolveApp(&quot;node_modules&quot;)],
+      use: [{
+        loader: &quot;babel-loader&quot;,
+        options: babelOptions
+      }]
+    }]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: &quot;webpack5演示demo&quot;,
+      mountRoot: &quot;root&quot;,
+      template: path.resolveApp(&quot;./src/index.html&quot;),
+      filename: &quot;index.html&quot;,
+      inject: 'body', // 所有javascript 资源都是加载到body底部
+      htmlContent: '&lt;%- __html__ %&gt;',
+      initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+      hash: true, // 为静态资源生成hash值
+      minify: { // 压缩HTML文件
+        removeComments: false, // 移除HTML中的注释
+        collapseWhitespace: false, // 删除空白符与换行符
+      },
+    })
+  ]
+}
+</code></pre>
+<p>再次启动开发服务器</p>
+<pre><code class="language-shell">yarn dev
+</code></pre>
+<p>通过浏览器访问localhost:3000，就会发现出现hello Bob</p>
+<figure data-type="image" tabindex="4"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220613193624202.png" alt="image-20220613193624202" loading="lazy"></figure>
+<h3 id="五-优化webpack-进度条">五、优化Webpack 进度条</h3>
+<p>由于启动Webpack 时，常常输出一堆太感兴趣的东西。因此，需要一个工具将其美化一下(webpackbar)</p>
+<pre><code class="language-shell">yarn add webpackbar -D
+</code></pre>
+<p>修改webpack.public.js的内容</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+const babelOptions = require(&quot;./babel.config.js&quot;)
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const WebpackBar = require('webpackbar');
+
+console.log(path.resolveApp(&quot;./src/index.html&quot;),)
+
+module.exports = {
+  entry: [
+    path.resolveApp(&quot;./src/index.js&quot;)
+  ],
+  resolve: {
+    extensions: [&quot;.jsx&quot;, &quot;.js&quot;, &quot;.json&quot;] // 无需后缀即可完成导入
+  },
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      include: [path.resolveApp(&quot;src&quot;)],
+      exclude: [path.resolveApp(&quot;node_modules&quot;)],
+      use: [{
+        loader: &quot;babel-loader&quot;,
+        options: babelOptions
+      }]
+    }]
+  },
+  plugins: [
+    new WebpackBar(),
+    new HtmlWebpackPlugin({
+      title: &quot;webpack5演示demo&quot;,
+      mountRoot: &quot;root&quot;,
+      template: path.resolveApp(&quot;./src/index.html&quot;),
+      filename: &quot;index.html&quot;,
+      inject: 'body', // 所有javascript 资源都是加载到body底部
+      htmlContent: '&lt;%- __html__ %&gt;',
+      initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+      hash: true, // 为静态资源生成hash值
+      minify: { // 压缩HTML文件
+        removeComments: false, // 移除HTML中的注释
+        collapseWhitespace: false, // 删除空白符与换行符
+      },
+    })
+  ]
+}
+</code></pre>
+<h3 id="六-使用antd">六、使用Antd</h3>
+<p>首先安装antd</p>
+<pre><code class="language-shell">yarn add antd -D
+</code></pre>
+<p>修改src/index.js</p>
+<pre><code class="language-react">import React from &quot;react&quot;;
+import { createRoot } from &quot;react-dom/client&quot;
+import { Button } from &quot;antd&quot;;
+
+function HelloMessage({ name }) {
+  return &lt;div&gt;
+    Hello {name}
+    &lt;div&gt;
+      &lt;Button&gt;测试&lt;/Button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+}
+
+
+const root = createRoot(
+  document.getElementById(&quot;root&quot;)
+)
+root.render(&lt;HelloMessage name={&quot;Bob&quot;} /&gt;)
+
+</code></pre>
+<p>这时启动yarn dev，就会出现一个报错。</p>
+<figure data-type="image" tabindex="5"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220613195040277.png" alt="image-20220613195040277" loading="lazy"></figure>
+<p>由于我们webpack没有对less指定loader解析，因此遇到less会报错。</p>
+<p>开发环境和生产环境上，对less解析有所不同。</p>
+<p>webpack.development.js</p>
+<pre><code class="language-javascript">const common = require(&quot;./webpack.public.js&quot;)
+const {
+  merge
+} = require(&quot;webpack-merge&quot;)
+const path = require(&quot;./paths.js&quot;)
+
+module.exports = merge(common, {
+  mode: &quot;development&quot;,
+  output: {
+    filename: &quot;[name].bundle.js&quot;,
+    clean: true,
+    path: path.resolveApp(&quot;dist&quot;),
+    publicPath: &quot;/&quot;
+  },
+  devServer: {
+    host: &quot;0.0.0.0&quot;,
+    port: 3000,
+    compress: true, // 开启服务器gzip压缩
+    open: false,
+    historyApiFallback: true, // 提供页面来替代404响应
+    hot: &quot;only&quot;, // 构建失败的情况下启动热模块替代而不是刷新页面
+  },
+  module: {
+    rules: [{
+      test: /\.less$/,
+      include: [/[\\/]node_modules[\\/].*antd/],
+      use: [{
+          loader: &quot;style-loader&quot;
+        },
+        {
+          loader: &quot;css-loader&quot;,
+          options: {
+            sourceMap: true,
+          }
+        },
+        {
+          loader: &quot;less-loader&quot;,
+          options: {
+            sourceMap: true,
+            lessOptions: {
+              javascriptEnabled: true,
+            }
+          }
+        }
+      ]
+    }]
+  }
+})
+</code></pre>
+<p>需要安装loader</p>
+<pre><code class="language-shell">yarn add style-loader -D
+yarn add css-loader -D
+yarn add less-loader -D
+yarn add less -D
+</code></pre>
+<p>完成以上操作，启动项目看看。</p>
+<figure data-type="image" tabindex="6"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220614095933738.png" alt="image-20220614095933738" loading="lazy"></figure>
+<p>看到效果了，代表less规则生效。</p>
+<p>webpack.product.js</p>
+<pre><code class="language-javascript">const common = require(&quot;./webpack.public.js&quot;)
+const {
+  merge
+} = require(&quot;webpack-merge&quot;)
+const path = require(&quot;./paths.js&quot;)
+const MiniCssExtractPlugin = require(&quot;mini-css-extract-plugin&quot;);
+const CssMinimizerPlugin = require(&quot;css-minimizer-webpack-plugin&quot;);
+
+module.exports = merge(common, {
+  mode: &quot;production&quot;,
+  output: {
+    filename: &quot;[name].[contenthash].bundle.js&quot;,
+    clean: true,
+    path: path.resolveApp(&quot;dist&quot;)
+  },
+  module: {
+    rules: [{
+      test: /\.less$/,
+      include: [/[\\/]node_modules[\\/].*antd/],
+      use: [{
+          loader: MiniCssExtractPlugin.loader,
+        },
+        {
+          loader: &quot;css-loader&quot;,
+          options: {
+            sourceMap: true,
+          }
+        },
+        {
+          loader: &quot;less-loader&quot;,
+          options: {
+            sourceMap: true,
+            lessOptions: {
+              javascriptEnabled: true,
+            }
+          }
+        }
+      ]
+    }]
+  },
+  plugins: [new MiniCssExtractPlugin({
+    filename: &quot;[name].[contenthash:8].css&quot;,
+    chunkFilename: &quot;[name].[contenthash:8].chunk.css&quot;
+  })], // 将css 提取到单独文件中，为每个css的js创建一个css文件，并且支持css和SourceMaps按需加载。
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new CssMinimizerPlugin({
+        parallel: true,
+        minimizerOptions: {
+          preset: [
+            &quot;default&quot;,
+            {
+              discardComments: {
+                removeAll: true
+              },
+            },
+          ],
+        },
+      }), // 用来压缩css文件的 
+    ]
+  }
+})
+</code></pre>
+<p>安装依赖</p>
+<pre><code class="language-shell">yarn add mini-css-extract-plugin -D
+yarn add css-minimizer-webpack-plugin -D 
+</code></pre>
+<h3 id="七-根据需求安装loader">七、根据需求安装loader</h3>
+<h4 id="1-css">1. css</h4>
+<p>如果项目中引用了css文件，而此时Webpack匹配规则并没有css解析器。因此我们需要分别对webpack.development.js 和 webpack.product.js进行添加规则</p>
+<p>webpack.development.js</p>
+<pre><code class="language-javascript">const common = require(&quot;./webpack.public.js&quot;)
+const {
+  merge
+} = require(&quot;webpack-merge&quot;)
+const path = require(&quot;./paths.js&quot;)
+
+module.exports = merge(common, {
+  mode: &quot;development&quot;,
+  output: {
+    filename: &quot;[name].bundle.js&quot;,
+    clean: true,
+    path: path.resolveApp(&quot;dist&quot;),
+    publicPath: &quot;/&quot;
+  },
+  devServer: {
+    host: &quot;0.0.0.0&quot;,
+    port: 3000,
+    compress: true, // 开启服务器gzip压缩
+    open: false,
+    historyApiFallback: true, // 提供页面来替代404响应
+    hot: &quot;only&quot;, // 构建失败的情况下启动热模块替代而不是刷新页面
+  },
+  module: {
+    rules: [{
+        test: /\.less$/,
+        include: [/[\\/]node_modules[\\/].*antd/],
+        use: [{
+            loader: &quot;style-loader&quot;
+          },
+          {
+            loader: &quot;css-loader&quot;,
+            options: {
+              sourceMap: true,
+            }
+          },
+          {
+            loader: &quot;less-loader&quot;,
+            options: {
+              sourceMap: true,
+              lessOptions: {
+                javascriptEnabled: true,
+              }
+            }
+          }
+        ]
+      },
+      {
+        test: /\.css$/,
+        include: [path.resolveApp(&quot;src&quot;)],
+        use: [{
+            loader: &quot;style-loader&quot;
+          },
+          {
+            loader: &quot;css-loader&quot;,
+            options: {
+              sourceMap: true,
+            }
+          },
+        ]
+      }
+    ],
+  }
+})
+</code></pre>
+<p>webpack.product.js</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+const babelOptions = require(&quot;./babel.config.js&quot;)
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const WebpackBar = require('webpackbar');
+
+console.log(path.resolveApp(&quot;./src/index.html&quot;), )
+
+module.exports = {
+  entry: [
+    path.resolveApp(&quot;./src/index.js&quot;)
+  ],
+  resolve: {
+    extensions: [&quot;.jsx&quot;, &quot;.js&quot;, &quot;.json&quot;] // 无需后缀即可完成导入
+  },
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      include: [path.resolveApp(&quot;src&quot;)],
+      exclude: [path.resolveApp(&quot;node_modules&quot;)],
+      use: [{
+        loader: &quot;babel-loader&quot;,
+        options: babelOptions
+      }]
+    }]
+  },
+  plugins: [
+    new WebpackBar(), // 进度条
+    new HtmlWebpackPlugin({
+      title: &quot;webpack5演示demo&quot;,
+      mountRoot: &quot;root&quot;,
+      template: path.resolveApp(&quot;./src/index.html&quot;),
+      filename: &quot;index.html&quot;,
+      inject: 'body', // 所有javascript 资源都是加载到body底部
+      htmlContent: '&lt;%- __html__ %&gt;',
+      initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+      hash: true, // 为静态资源生成hash值
+      minify: { // 压缩HTML文件
+        removeComments: false, // 移除HTML中的注释
+        collapseWhitespace: false, // 删除空白符与换行符
+      },
+    })
+  ]
+}
+</code></pre>
+<p>在src目录下，添加index.css</p>
+<p>index.css</p>
+<pre><code class="language-css">.demo1{
+    background-color: red;
+}
+</code></pre>
+<p>修改index.js</p>
+<pre><code class="language-react">import React from &quot;react&quot;;
+import { createRoot } from &quot;react-dom/client&quot;
+import { Button } from &quot;antd&quot;;
+import &quot;./index.css&quot;
+
+
+function HelloMessage({ name }) {
+  return &lt;div&gt;
+    Hello {name}
+    &lt;div className={&quot;demo1&quot;}&gt;
+      &lt;Button&gt;测试&lt;/Button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+}
+
+
+const root = createRoot(
+  document.getElementById(&quot;root&quot;)
+)
+root.render(&lt;HelloMessage name={&quot;Bob&quot;} /&gt;)
+</code></pre>
+<p>出现以下效果，则代表规则匹配上。</p>
+<figure data-type="image" tabindex="7"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220614104445246.png" alt="image-20220614104445246" loading="lazy"></figure>
+<h4 id="2-png-jpeg-gif">2. png, jpeg, gif</h4>
+<p>webpack匹配规则现在无法对png,jpeg,git进行解析，因此我们需要对其添加解析器。</p>
+<p>webpack.public.js</p>
+<pre><code class="language-javascript">const path = require(&quot;./paths.js&quot;)
+const babelOptions = require(&quot;./babel.config.js&quot;)
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const WebpackBar = require('webpackbar');
+
+module.exports = {
+  output: {
+    assetModuleFilename: &quot;images/[hash][ext]&quot;,    // 将png,jpg,jpeg,gif等资源文件存放到images下。
+  },
+  entry: [
+    path.resolveApp(&quot;./src/index.js&quot;)
+  ],
+  resolve: {
+    extensions: [&quot;.jsx&quot;, &quot;.js&quot;, &quot;.json&quot;] // 无需后缀即可完成导入
+  },
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      include: [path.resolveApp(&quot;src&quot;)],
+      exclude: [path.resolveApp(&quot;node_modules&quot;)],
+      use: [{
+        loader: &quot;babel-loader&quot;,
+        options: babelOptions
+      }]
+    },
+    {
+      test:  /\.(png|jpg|jpeg|gif)$/,
+      type: &quot;asset/resource&quot;,
+    }
+  ]
+  },
+  plugins: [
+    new WebpackBar(), // 进度条
+    new HtmlWebpackPlugin({
+      title: &quot;webpack5演示demo&quot;,
+      mountRoot: &quot;root&quot;,
+      template: path.resolveApp(&quot;./src/index.html&quot;),
+      filename: &quot;index.html&quot;,
+      inject: 'body', // 所有javascript 资源都是加载到body底部
+      htmlContent: '&lt;%- __html__ %&gt;',
+      initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+      hash: true, // 为静态资源生成hash值
+      minify: { // 压缩HTML文件
+        removeComments: false, // 移除HTML中的注释
+        collapseWhitespace: false, // 删除空白符与换行符
+      },
+    })
+  ]
+}
+</code></pre>
+<p>修改src目录下的index.js</p>
+<pre><code class="language-react">import React from &quot;react&quot;;
+import { createRoot } from &quot;react-dom/client&quot;
+import { Button, Avatar } from &quot;antd&quot;;
+import &quot;./index.css&quot;
+import User1 from &quot;./user1.jpeg&quot;
+
+function HelloMessage({ name }) {
+  return &lt;div&gt;
+    Hello {name}
+    &lt;div className={&quot;demo1&quot;}&gt;
+      &lt;Button&gt;测试&lt;/Button&gt;
+    &lt;/div&gt;
+    &lt;Avatar src={User1}/&gt;
+  &lt;/div&gt;
+}
+
+
+const root = createRoot(
+  document.getElementById(&quot;root&quot;)
+)
+root.render(&lt;HelloMessage name={&quot;Bob&quot;} /&gt;)
+</code></pre>
+<figure data-type="image" tabindex="8"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20220614110508781.png" alt="image-20220614110508781" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[webpack5使用optimize-css-assets-webpack-plugin的坑]]></title>
+        <id>https://a1733452028.github.io/post/webpack5-shi-yong-optimize-css-assets-webpack-plugin-de-keng/</id>
+        <link href="https://a1733452028.github.io/post/webpack5-shi-yong-optimize-css-assets-webpack-plugin-de-keng/">
+        </link>
+        <updated>2022-05-31T06:26:23.000Z</updated>
+        <content type="html"><![CDATA[<p>HookWebpackError: Cannot read properties of undefined (https://a1733452028.github.io/post-images/1653978441759.jpeg)<br>
+首先看到这个报错，我是一脸懵逼的。<br>
+但静下心来查看报错，就会发现TypeError 似乎都是发生在于css。<br>
+那根据以往经验来判断，要不就是解析css出问题要不就是其他的地方处理css的时候出现问题。<br>
+看到错误里面出现了postcss，我一开始以为是css里面使用postcss-loader解析器导致的，后来去Webpack配置文件里面查看，发现并没有使用这个loader解析器。于是我将目光投递到postcss-merge-longhand<img src="https://a1733452028.github.io/post-images/1653978468712.jpeg" alt="" loading="lazy"><br>
+然后搜索浏览器，发现一个很有趣的地方，就是他github会调转到cssnao这个库里面。https://www.npmjs.com/package/postcss-merge-longhand<br>
+然后，我发现cssnao好像有使用在webpack里面。<img src="https://a1733452028.github.io/post-images/1653978487524.jpeg" alt="" loading="lazy"><br>
+发现cssnao 使用在optimize-css-assets-webpack-plugin这个插件里面。<br>
+刚好这个插件是处理css的。(用于压缩css)。<br>
+去github搜索这个插件，发现已经很久没有更新维护，以及提醒webpack5尽量使用新的插件<a href="https://a1733452028.github.io/post-images/1653978573269.jpeg">css-minimizer-webpack-plugin</a><br>
+于是，我将optimize-css-assets-webpack-plugin插件替换成css-minimizer-webpack-plugin 后进行打包，发现并没有出现错误。<br>
+出于技术的好奇心，我很想知道到底是什么原因导致了optimize-css-assets-webpack-plugin压缩css的时候出现了问题。通过比较原始的手段来进行排查，后来发现原因就出现在less里面编写了以下内容导致的</p>
+<ol>
+<li>border-color:  rgba(51, 112, 255, 1);</li>
+<li>border: 3px solid rgba(51, 112, 255, 1);</li>
+</ol>
+<p>一开始怀疑是rgba的原因导致的，后来通过实验得出，并不是rgba的原因导致的。<br>
+目前只测试出以上两种写法会导致压缩css出现报错。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[线上fouc问题分析]]></title>
+        <id>https://a1733452028.github.io/post/xian-shang-fouc-wen-ti-fen-xi/</id>
+        <link href="https://a1733452028.github.io/post/xian-shang-fouc-wen-ti-fen-xi/">
+        </link>
+        <updated>2022-05-23T03:58:17.000Z</updated>
+        <content type="html"><![CDATA[<h2 id=""></h2>
+<p>有用户反馈apmbox系统在模块之间来回切换，会有一瞬间样式丢失。首次加载的时候却没有发生丢失的现象<img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20220523_1653278154463480000-20220523115714060.gif" alt="fouc" loading="lazy"></p>
+<h2 id="问题分析">问题分析</h2>
+<p>由于这个问题是首次遇到，在问题分析上并没有很好的思路。只能见招拆招，由于是子应用之间切换导致样式丢失，这很难让人不对qiankun这个微前端框产生怀疑。于是，产生了很多对qiankun类似的问题分析</p>
+<ol>
+<li>子应用切换的时候, 样式没有加载？</li>
+<li>是否是dom界面中的<Link></Link>标签 在子应用节点之后，导致样式延后加载</li>
+<li>能否将Link标签 调整成子应用dom节点之前，加载css样式的速度</li>
+<li>为什么qiankun的样式劫持函数会迟于生命周期</li>
+<li>浏览器是否有bug，更换浏览器观察一下？</li>
+</ol>
+<h2 id="探索道路">探索道路</h2>
+<p>首先，我们对问题背景进行一波分析，样式丢失是发生在子应用切换期间，应用首次加载的时候没有出现样式丢失。</p>
+<p>那排查的问题从子应用切换开始，打开Chrome 浏览器查看。发现css样式的加载是在html的body里面。</p>
+<pre><code class="language-html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://devapmbox.gz4399.com/slogsearch/467.670e3253.chunk.css&quot;&gt;
+</code></pre>
+<p>如果，想将外部css的样式表添加到我们实际项目中，需要将link的rel 设置成stylesheet。</p>
+<p>由于js对dom节点操作，是属于异步js。因此在动态添加Link的时候，请求css样式表是属于异步操作。一旦浏览器css 缓存消失，css就会重新请求。由于浏览器的渲染过程中，js和css 是属于并行操作，但由于js是在本地浏览器，不需要网络开销。因此会导致js生成树已经完成,css生成树并没有完成，两者相结合渲染树，这时的效果是一个没有css样式的组件呈现在页面上。之后,css样式请求完毕，浏览器会重新生成css生成树，然后和js生成树重新结合渲染树。这时浏览器就会呈现出有样式的组件。</p>
+<p>因此，根据以上观点。基本可以排除问题分析第二，三点的作用。只要link标签添加到body里面，Link的效果都是异步js的作用，无法阻止浏览器渲染，因此还会出现fouc的现象。问题分析第一点可以排除，子应用在切换的时候，样式表是有加载的，只是加载速度慢于页面呈现的速度，因此会产生fouc的现象。</p>
+<p>目前，问题分析中还有第4,5点还没有排除。我先尝试验证一下第五点，下载firefox浏览器测试一下。经过测试，发现firefox无论怎么操作都不会出现fouc,不过测试的时候发现，点击时切换的流畅度是没有谷歌浏览器流畅，因此我猜测是firefox的渲染引擎和chrome浏览器渲染引擎略有不同。**目前还没找到相关的资料，来证明firefox在body标签动态插入link标签与chrome浏览器表现不同。**通过上述的实验，可以证明问题分析第5点成立，确实不同浏览器呈现的效果不同。</p>
+<p>为了验证问题分析四，我在qiankun的excludeAssetFilter劫持css样式函数上进行console.log操作，发现qiankun的beforeMount进行console.log的操作，先于excludeAssetFilter。而样式表只能出现excludeAssetFilter上，因此，推断出无法在子应用挂载之前加css样式表追加到head标签里面。除非更改qiankun的沙箱模式。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Webpack打包异常排查思路]]></title>
+        <id>https://a1733452028.github.io/post/webpack-da-bao-yi-chang-pai-cha-si-lu/</id>
+        <link href="https://a1733452028.github.io/post/webpack-da-bao-yi-chang-pai-cha-si-lu/">
+        </link>
+        <updated>2022-05-09T05:50:29.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="一-问题描述">一、问题描述</h2>
+<p>考勤系统在访问某个页面时出现异常的问题 <a href="https://devkq.gz4399.com/overview/yuzhu/worktime">复现地址</a></p>
+<h2 id="二-具体分析">二、具体分析</h2>
+<p>异常页面出现以下的内容：Uncaught (in promise) TypeError: Super expression must either be null or a function</p>
+<p>出现以上错误后，我在google上搜索得出的结果大部分都是说我的编写React时语法出现问题。<a href="https://www.google.com/search?q=Super+expression+must+either+be+null+or+a+function&amp;oq=Super+expression+must+either+be+null+or+a+function&amp;aqs=chrome.0.69i59j0i512l5j69i60l2.299j0j7&amp;sourceid=chrome&amp;ie=UTF-8">google搜索结果</a></p>
+<p>不过，这个结论很快就被我否决掉。因为本地开发的时候，这个页面是可以正常运行的。</p>
+<h2 id="三-排查思路">三、排查思路</h2>
+<p>通过具体分析中，我归纳总结出了大概解决思路：</p>
+<ol>
+<li>
+<p>首先webpack development模式(开发模式)上是不存在任何问题，出现问题是在 production (生产模式)</p>
+</li>
+<li>
+<p>异常报错 指出我React 语法有问题,  并且报错的文件指向是Js类型的文件。</p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20220509_1652063755567828000-20220509135259010.png" alt="image-20220509103553924" loading="lazy"></figure>
+</li>
+</ol>
+<h2 id="四-尝试解决问题">四、尝试解决问题</h2>
+<p>有了大概思路，就需要实践一波了。</p>
+<p>首先，查看webpack配置文件(这个项目比较特殊，webpack配置文件只存在一份文件)</p>
+<p><code>webapck.config.js</code></p>
+<pre><code class="language-javascript">const path = require('path');
+const fs = require('fs');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const merge = require('webpack-merge');
+const TerserJSPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+
+const lessToJs =require('less-vars-to-js');
+const paletteLess = fs.readFileSync('src/styles/variables.less', 'utf8');
+const lessVars = lessToJs(paletteLess, {resolveVariables: true, stripPrefix: true});
+if(lessVars['font-family']){
+  lessVars['font-family'] = `&quot;${lessVars['font-family']}&quot;`
+}
+const aliyunTheme = require('../node_modules/@ant-design/aliyun-theme').default;
+
+module.exports = (env) =&gt; {
+  const isDev = env.mode === 'development';
+  let config;
+
+  const base = {
+    mode: isDev ? 'development' : 'production',
+    devtool: 'inline-source-map',
+    context: path.resolve(__dirname, '../'),
+    // 入口这里reat-hot-loader官文说要加上reat-hot-loader、patch，以及下面的react-babel-loader/babel，实测加上会导致开发模式下radiobutton异常，去掉并不影响热加载和浏览器自动刷新，所以不要加了。
+    entry: ['@babel/polyfill', './src/index.js'],
+    output: {
+      path: path.resolve(__dirname, '../dist'),
+      pathinfo: isDev,
+      filename: isDev ? '[name].js' : '[name].[hash:8].js',
+      publicPath: '/',
+      chunkFilename: isDev ? '[name].chunk.js' : '[name].[hash:8].chunk.js',
+      hotUpdateMainFilename: '[hash].hot-update.json',
+    },
+    module: {
+      rules: [
+        // {
+        //   enforce: 'pre',
+        //   test: /\.js$|\.jsx$/,
+        //   loader: 'eslint-loader',
+        //   include: [path.resolve(__dirname, '../src')],
+        //   exclude: [path.resolve(__dirname, '../src/views/components/term_record')],
+        // },
+        {
+          test: /\.(js|jsx)$/,
+          include: [path.resolve(__dirname, '../src')],
+          exclude: [path.resolve(__dirname, '../node_modules')],
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  ['@babel/preset-env', {
+                    useBuiltIns: false,
+                  }],
+                  '@babel/preset-react',
+                ],
+                plugins: [
+                  // &quot;@babel/plugin-transform-runtime&quot;,
+                  '@babel/plugin-syntax-dynamic-import',
+                  ['@babel/plugin-proposal-decorators', { legacy: true }],
+                  ['@babel/plugin-proposal-class-properties', { loose: true }],
+                  '@babel/plugin-proposal-export-default-from',
+                  '@babel/plugin-transform-reserved-words',
+                  'inline-react-svg',
+                  ['import', { libraryName: 'antd', style: true }, 'antd'],
+                  ['import', { libraryName: 'ant-design-pro', libraryDirectory: 'lib', style: true, camel2DashComponentName: false}, 'ant-design-pro']
+                ],
+                // This is a feature of `babel-loader` for webpack (not Babel itself).
+                // It enables caching results in ./node_modules/.cache/babel-loader/
+                // directory for faster rebuilds.
+                cacheDirectory: true,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.css$/,
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ],
+        },
+        // 解析未启用css-modules的less文件
+        {
+          test: /\.less$/,
+          include: [/[\\/]node_modules[\\/].*antd/],
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+            {
+              loader: 'less-loader',
+              options: {
+                sourceMap: true,
+                modifyVars: {
+                  ...aliyunTheme,
+                  ...lessVars,
+                  '@icon-url': '&quot;../../../../../public/fonts/anticon/font_r5u29ls31bgldi&quot;',
+                },
+                javascriptEnabled: true,
+              },
+            },
+          ],
+        },
+        // 解析启用css-modules的less文件
+        {
+          test: /\.less$/,
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: '[name]__[local]',
+                importLoaders: 2,
+              },
+            }, {
+              loader: 'less-loader',
+              options: {
+                javascriptEnabled: true,
+                modifyVars: {
+                  ...aliyunTheme,
+                  ...lessVars,
+                },
+              },
+            },
+          ],
+          include: [path.resolve(__dirname, '../src')],
+          exclude: [path.resolve(__dirname, '../node_modules')],
+        },
+        // 处理anticon图标字体文件
+        {
+          resource: path.resolve(__dirname, '../public/fonts/anticon'),
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                name: 'assets/anticon/[name].[ext]'
+              }
+            }
+          ],
+        },
+        {
+          test: /\.(png|jpg|gif)$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]',
+                outputPath: 'images/',
+                // publicPath: 'images/',
+              },
+            },
+          ],
+        },
+        {
+          test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+            },
+            {
+              loader: '@svgr/webpack',
+              options: {
+                babel: false,
+                icon: true,
+              },
+            },
+          ],
+        }
+      ],
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        title: '蓝海系统',
+        template: path.join(__dirname, '../src/index.html'),
+        filename: 'index.html',
+        inject: 'body',
+        htmlContent: '&lt;%- __html__ %&gt;',
+        initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+        hash: true,    // 为静态资源生成hash值
+        minify: {    // 压缩HTML文件
+          removeComments: false,    // 移除HTML中的注释
+          collapseWhitespace: false,    // 删除空白符与换行符
+        },
+      }),
+    ],
+    resolve: {
+      modules: [
+        path.resolve(__dirname, '../src'),
+        './node_modules',
+      ],
+      alias: {
+        // 解决rsuite-picker依赖旧版本react导致找不到react/lib/ReactDOM的问题
+        'react-dom': path.resolve(__dirname, '../node_modules/react-dom'),
+      },
+      extensions: ['.js', '.jsx', '.json'],
+    },
+  };
+  if (isDev) {
+    config = merge(base, {
+      module: {
+        rules: [
+          // 前端页面性能监控
+          {
+            test: require.resolve('react-addons-perf'),
+            use: [{
+              loader: 'expose-loader',
+              options: 'Perf',
+            }],
+          },
+        ],
+      },
+      plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        // 当接收到热更新信号时，在浏览器console控制台打印更多可读性高的模块名称等信息
+        new webpack.NamedModulesPlugin(),
+      ],
+      devServer: {
+        compress: true,
+        open: false,
+        host: '0.0.0.0',
+        port: 3011,
+        index: 'src/index.html',
+        publicPath: '/',
+        historyApiFallback: true, // 设为false会导致手动刷新页面（路由有效）时，报404
+        // 配置热加载,所有配置替代方案：webpack-cli --inline --hot --hot-only
+        inline: true, // 实时刷新
+        // 注意，必须有 webpack.HotModuleReplacementPlugin 才能完全启用 HMR。如果 webpack 或 webpack-dev-server 是通过 --hot 选项启动的，那么这个插件会被自动添加，所以你可能不需要把它添加到 webpack.config.js 中。
+        hot: true, // 模块热更新。依赖于HotModuleReplacementPlugin,或者 entry加入'webpack-dev-server/client?http://0.0.0.0:3104'
+        hotOnly: true, // 或者entry加入[''webpack/hot/only-dev-server'','webpack/hot/poll?1000']
+        watchOptions: {
+          ignored: /node_modules/,
+        },
+        // 配置console.log信息输出
+        noInfo: false,
+        clientLogLevel: 'warning', // 不在浏览器console中输出热加载信息
+        stats: {
+          // copied from `'minimal'`
+          all: false,
+          modules: true,
+          maxModules: 0,
+          errors: true,
+          warnings: true,
+          // our additional options
+          colors: true,
+          timings: true,
+          moduleTrace: true,
+          errorDetails: true,
+          assets: false,
+        },
+      },
+    });
+  } else {
+    config = merge(base, {
+      optimization: {
+        minimizer: [
+          new TerserJSPlugin({
+            test: /\.(js|jsx)(\?.*)?$/i,
+            exclude: [path.resolve(__dirname, '../node_modules')],
+            parallel: 4,
+            terserOptions: {
+              compress: {
+                pure_funcs: ['console.info', 'console.debug', 'console.warn']
+              }
+            }
+          }),
+          new OptimizeCssAssetsPlugin({
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true,
+          }),
+        ],
+        splitChunks: {
+          cacheGroups: {
+            verdor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all'
+            },
+            styles: {
+              name: 'styles',
+              test: /\.css$/,
+              chunks: 'all',
+              enforce: true,
+              priority: 10,
+            },
+          },
+        },
+      },
+      plugins: [
+        new MiniCssExtractPlugin({
+          filename: isDev ? '[name].css' : '[name].[hash:8].css',
+          chunkFilename: isDev ? '[name].chunk.css' : '[name].[hash:8].chunk.css',
+        }),
+      ],
+      stats: 'errors-only',
+    });
+  }
+  return config;
+};
+
+</code></pre>
+<p>根据上述的思路，进行逐一分析</p>
+<p>出现问题的是 production and js文件</p>
+<p>webpack里面 Module rules 匹配的js| jsx 文件并没有对 Mode 不同做出不同的处理，因此排除</p>
+<pre><code class="language-javascript">...
+{
+          test: /\.css$/,
+          use: [
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ],
+        },
+  ...
+</code></pre>
+<p>这个规则虽然有针对不同mode去做特殊处理，但并不是针对js文件来的，因此也排除掉</p>
+<p>less 和 css 的规则大致相同，因此也排除掉</p>
+<p>继续往下看，会发现有个比较有意思的地方</p>
+<pre><code class="language-javascript">...
+if (isDev) {
+    config = merge(base, {
+      module: {
+        rules: [
+          // 前端页面性能监控
+          {
+            test: require.resolve('react-addons-perf'),
+            use: [{
+              loader: 'expose-loader',
+              options: 'Perf',
+            }],
+          },
+        ],
+      },
+      plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        // 当接收到热更新信号时，在浏览器console控制台打印更多可读性高的模块名称等信息
+        new webpack.NamedModulesPlugin(),
+      ],
+      devServer: {
+        compress: true,
+        open: false,
+        host: '0.0.0.0',
+        port: 3011,
+        index: 'src/index.html',
+        publicPath: '/',
+        historyApiFallback: true, // 设为false会导致手动刷新页面（路由有效）时，报404
+        // 配置热加载,所有配置替代方案：webpack-cli --inline --hot --hot-only
+        inline: true, // 实时刷新
+        // 注意，必须有 webpack.HotModuleReplacementPlugin 才能完全启用 HMR。如果 webpack 或 webpack-dev-server 是通过 --hot 选项启动的，那么这个插件会被自动添加，所以你可能不需要把它添加到 webpack.config.js 中。
+        hot: true, // 模块热更新。依赖于HotModuleReplacementPlugin,或者 entry加入'webpack-dev-server/client?http://0.0.0.0:3104'
+        hotOnly: true, // 或者entry加入[''webpack/hot/only-dev-server'','webpack/hot/poll?1000']
+        watchOptions: {
+          ignored: /node_modules/,
+        },
+        // 配置console.log信息输出
+        noInfo: false,
+        clientLogLevel: 'warning', // 不在浏览器console中输出热加载信息
+        stats: {
+          // copied from `'minimal'`
+          all: false,
+          modules: true,
+          maxModules: 0,
+          errors: true,
+          warnings: true,
+          // our additional options
+          colors: true,
+          timings: true,
+          moduleTrace: true,
+          errorDetails: true,
+          assets: false,
+        },
+      },
+    });
+  } else {
+    config = merge(base, {
+      optimization: {
+        minimizer: [
+          new TerserJSPlugin({
+            test: /\.(js|jsx)(\?.*)?$/i,
+            exclude: [path.resolve(__dirname, '../node_modules')],
+            parallel: 4,
+            terserOptions: {
+              compress: {
+                pure_funcs: ['console.info', 'console.debug', 'console.warn']
+              }
+            }
+          }),
+          new OptimizeCssAssetsPlugin({
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true,
+          }),
+        ],
+        splitChunks: {
+          cacheGroups: {
+            verdor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all'
+            },
+            styles: {
+              name: 'styles',
+              test: /\.css$/,
+              chunks: 'all',
+              enforce: true,
+              priority: 10,
+            },
+          },
+        },
+      },
+...
+</code></pre>
+<p>由于问题出现在production模式下，因此我们只需关系 else里面的逻辑即可</p>
+<pre><code class="language-javascript">config = merge(base, {
+      optimization: {
+        minimizer: [
+          new TerserJSPlugin({ }),
+          new OptimizeCssAssetsPlugin({
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true,
+          }),
+        ],
+        splitChunks: {
+          cacheGroups: {
+            verdor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all'
+            },
+            styles: {
+              name: 'styles',
+              test: /\.css$/,
+              chunks: 'all',
+              enforce: true,
+              priority: 10,
+            },
+          },
+        },
+      },
+      plugins: [
+        new MiniCssExtractPlugin({
+          filename: isDev ? '[name].css' : '[name].[hash:8].css',
+          chunkFilename: isDev ? '[name].chunk.css' : '[name].[hash:8].chunk.css',
+        }),
+      ],
+      stats: 'errors-only',
+    });
+</code></pre>
+<p>根据对插件的大概了解，会发现webpack在打包时进行了优化(压缩一下)</p>
+<p><a href="https://webpack.docschina.org/configuration/optimization/#optimizationminimizer">webpack优化参数</a> 有兴趣的可以去了解一下，webpack如何进行优化处理</p>
+<p>一个压缩Js插件 引起了我的注意。<a href="https://webpack.docschina.org/plugins/terser-webpack-plugin/">terset-webpack-plugin</a></p>
+<p>根据上述具体分析得出：异常是 mode = production and js ，那么刚好这个terset插件只有在mode = production 并且用来处理js文件的。通过查看package.json文件，并没有找到这个插件，但通过yarn.lock文件，发现了安装webpack4版本时，一同安装了这个插件。</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20220509_1652064814038976000.png" alt="image-20220509105332989" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[webpack工程化]]></title>
+        <id>https://a1733452028.github.io/post/webpack-gong-cheng-hua/</id>
+        <link href="https://a1733452028.github.io/post/webpack-gong-cheng-hua/">
+        </link>
+        <updated>2021-12-15T02:12:23.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="迁移原因">迁移原因</h3>
+<p>由于roadhogrc封装的webpack版本太旧，不适合用于现代组件的打包，因此会在引用高版本的组件时出现语法错误等原因，最终导致打包失败(严重影响项目的正常运行)</p>
+<h3 id="1-如何运行webpack">1、如何运行webpack</h3>
+<p>在迁移之前需要弄懂如何通过简答的webpack来运行项目</p>
+<p>安装webpack时，最好使用最高版本的node.js来安装</p>
+<p><em><strong>webpack-cli: 命令行工具(webpack5 可以不需要了)</strong></em></p>
+<pre><code class="language-cmd">yarn add webapck, webapck-cli
+</code></pre>
+<h3 id="2-文件目录结构">2、文件目录结构</h3>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214194736283.png" alt="image-20211214194736283" loading="lazy"></figure>
+<p>config ：存放webpack的配置文件</p>
+<p>src ：存放业务逻辑文件</p>
+<p>package.json：记录依赖包的版本号</p>
+<p>生产环境下</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211215093347005.png" alt="image-20211215093347005" loading="lazy"></figure>
+<p>通过对比，会发现新增了一个文件.babelrc</p>
+<p>.babelrc 文件主要是配置babel-loader的参数</p>
+<pre><code class="language-javascript">{
+  &quot;presets&quot;: [
+    [
+      &quot;@babel/preset-env&quot;,
+      {
+        &quot;useBuiltIns&quot;: false,
+        &quot;modules&quot;: false
+      }
+    ],
+    &quot;@babel/preset-react&quot;
+  ],
+  &quot;plugins&quot;: [
+    [
+      &quot;@babel/plugin-transform-runtime&quot;,
+      {
+        &quot;corejs&quot;: 3
+      }
+    ],
+    &quot;@babel/plugin-transform-modules-commonjs&quot;,
+    &quot;@babel/plugin-syntax-dynamic-import&quot;,
+    [
+      &quot;babel-plugin-import&quot;,
+      {
+        &quot;libraryName&quot;: &quot;antd&quot;,
+        &quot;libraryDirectory&quot;: &quot;es&quot;,
+        &quot;style&quot;: true
+      }
+    ],
+    &quot;inline-react-svg&quot;,
+    &quot;@babel/plugin-transform-reserved-words&quot;,
+    &quot;@babel/plugin-proposal-export-default-from&quot;,
+    &quot;@babel/plugin-proposal-nullish-coalescing-operator&quot;,
+    &quot;@babel/plugin-proposal-optional-chaining&quot;,
+    [&quot;@babel/plugin-proposal-decorators&quot;,{
+      &quot;legacy&quot;: true
+    }],
+    &quot;@babel/plugin-proposal-class-properties&quot;
+  ]
+}
+</code></pre>
+<h3 id="3-webpack-基本配置">3、webpack 基本配置</h3>
+<p>Resolve: 这些选项能设置模块如何被解析。webpack 提供合理的默认值，但是还是可能会修改一些解析的细节。关于 resolver 具体如何工作的更多解释说明，请查看<a href="https://webpack.docschina.org/concepts/module-resolution">模块解析</a></p>
+<p><code>Resolve.extensions</code> 尝试按顺序解析这些后缀名。如果有多个文件有相同的名字，但后缀名不同，webpack 会解析列在数组首位的后缀的文件 并跳过其余的后缀。</p>
+<p><code>asset/resource</code> 发送一个单独的文件并导出 URL。之前通过使用 <code>file-loader</code> 实现。</p>
+<p><code>css-loader</code> 主要是解析css文件中的@import和url语句，处理css-modules，并将结果作为一个js模块返回。通俗的来说：会处理import/require() @import/url 引入的内容  <em><strong>重点: css-loader处理之后，返回的是数组，页面无法实现数组</strong></em></p>
+<pre><code class="language-javascript">// 假如我们有a.css、b.css、c.css
+
+// a.css
+@import './b.css'; // 导入b.css
+
+.a {
+  font-size: 16px;
+}
+
+// b.css
+@import './c.css'; // 导入c.css
+
+.b {
+  color: red;
+}
+
+// c.css
+.c {
+  font-weight: bolder;
+}
+
+// 可以理解为css-loader将a.css、b.css和c.css的样式内容以字符串的形式拼接在一起，并将其作为js模块的导出内容。
+
+// css-loader源码（经简化）
+// https://github.com/webpack-contrib/css-loader/blob/master/src/index.js
+import postcss from 'postcss';
+
+module.exports = async function (content, map, meta) {
+  const options = this.getOptions(); // 获取配置
+
+  const plugins = []; // 转译源码所需的postcss插件
+  shouldUseModulesPlugins(options, this) &amp;&amp; plugins.push(modulesPlugins); // 处理css-modules
+  shouldUseImportPlugin(options, this) &amp;&amp; plugins.push(importPlugin); // 处理@import语句
+  shouldUseURLPlugin(options, this) &amp;&amp; plugins.push(urlPlugin); // 处理url()语句
+  shouldUseIcssPlugin(options, this) &amp;&amp; plugins.push(icssPlugin); // 处理icss相关逻辑
+
+  if (meta &amp;&amp; meta.ast) { // 复用前面loader生成的CSS AST（如postcss-loader）
+    content = meta.ast.root;
+  }
+
+  const result = await postcss(plugins).process(content); // 使用postcss转译源码
+
+  const importCode = getImportCode(); // 需要导入的依赖语句
+  const moduleCode = getModuleCode(result); // 模块导出内容
+  const exportCode = getExportCode(); // 其他需要导出的信息，如css-modules的类名映射等
+
+  const callback = this.async(); // 异步返回
+  callback(null, `${importCode}${moduleCode}${exportCode}`);
+};
+</code></pre>
+<p><code>style-loader</code> 经过css-loader的转译，我们已经得到了完整的css样式代码，style-loader的作用就是将结果以style标签的方式插入DOM树中。通俗来说：css-loader 解析后的内容挂载到html页面中。 <strong>因此：需要搭配css-loader使用</strong></p>
+<pre><code class="language-javascript">// 但css-loader返回的不是css样式代码的文本，而是一个js模块的代码，将这些js代码直接放进style标里显然是不行的。
+
+// style-loader
+import loaderUtils from 'loader-utils';
+
+module.exports = function (content) {
+  // do nothing
+};
+
+module.exports.pitch = function (remainingRequest) {
+  /*
+  * 用require语句获取css-loader返回的js模块的导出
+  * 用'!!'前缀跳过配置中的loader，避免重复执行
+  * 用remainingRequest参数获取loader链的剩余部分，在本例中是css-loader、less-loader
+  * 用loaderUtils的stringifyRequest方法将request语句中的绝对路径转为相对路径
+  */
+  const requestPath = loaderUtils.stringifyRequest(this, '!!' + remainingRequest);
+
+  // 本例中requestPath为:
+  // '!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!src/styles/index.less'
+
+  return `
+    const content = require(${requestPath})
+    const style = document.createElement('style');
+    style.innerHTML = content;
+    document.head.appendChild(style);
+  `;
+};
+</code></pre>
+<p><code>less-loader</code> **<a href="https://link.zhihu.com/?target=http%3A//lesscss.cn/">Less</a>**是CSS预处理语言，扩展了CSS语言，增加了变量、Mixin、函数等特性，Less-loader的作用就是将less代码转译为浏览器可以识别的CSS代码。</p>
+<pre><code class="language-javascript">// demo.less
+@base: #f938ab;
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  -webkit-box-shadow: @style @c;
+  box-shadow:         @style @c;
+}
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+.box {
+  color: saturate(@base, 5%);
+  border-color: lighten(@base, 30%);
+  div { .box-shadow(0 0 5px, 30%) }
+}
+
+// 上面的less代码会被less-loader编译成
+// demo.css
+.box {
+  color: #fe33ac;
+  border-color: #fdcdea;
+}
+.box div {
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+// less-loader 原理：
+// less-loader实现（经简化）
+const less = require('less');
+
+module.exports = function(content) {
+  const callback = this.async(); // 转译比较耗时，采用异步方式
+  const options = this.getOptions(); // 获取配置文件中less-loader的options
+  
+  less.render(
+    content,
+    createOptions(options), // less转译的配置
+    (err, output) =&gt; {
+      callback(err, output.css); // 将生成的css代码传递给下一个loader
+    }
+  );
+};
+</code></pre>
+<p>webpack.commont.js</p>
+<pre><code class="language-javascript">module.exports = {
+  // 入口
+  entry: {
+    index: './src/index.js',
+  },
+  // 输出
+  output: {
+    filename: '[name].bundle.js' || '[name].[contenthash].bundle.js',
+    path: paths.appDist,
+    // publicPath: paths.appPublic,
+    // 编译前清除目录
+    clean: true
+  },
+  resolve: {
+    extensions: ['.tsx', '.jsx', '.ts', '.js'], 
+  },
+  plugins: [
+    // 生成html，自动引入所有bundle
+    new HtmlWebpackPlugin({
+      title: 'release_v1',
+    }),
+    // 进度条
+    new ProgressBarPlugin({
+      format:'  :msg [:bar] :percent (:elapsed s)'
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        include: [
+          paths.appSrc,
+        ],
+        type: 'asset/resource',
+      },
+      {
+        test: /.(woff|woff2|eot|ttf|otf)$/i,
+        include: [
+           paths.appSrc,
+         ],
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          'css-loader',
+        ],
+      },
+      {
+        test: /.(scss|sass)$/,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          'css-loader',
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.module\.(scss|sass)$/,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          {
+            loader: 'css-loader',
+            options: {
+              // Enable CSS Modules features
+              modules: true,
+              importLoaders: 2,
+              // 0 =&gt; no loaders (default);
+              // 1 =&gt; postcss-loader;
+              // 2 =&gt; postcss-loader, sass-loader
+            },
+          },
+          // 将 PostCSS 编译成 CSS
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    // postcss-preset-env 包含 autoprefixer
+                    'postcss-preset-env',
+                  ],
+                ],
+              },
+            },
+          },
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.(js|ts|jsx|tsx)$/,
+        include: paths.appSrc,
+        use: [
+          {
+            loader: 'esbuild-loader',
+            options: {
+              loader: 'tsx',
+              target: 'es2015',
+            },
+          }
+        ]
+      }
+    ],
+  },
+}
+</code></pre>
+<p>Webpack.dev.js</p>
+<pre><code class="language-javascript">module.exports = merge(common, {
+  // 模式
+  mode: 'development',
+  // 开发工具，开启 source map，编译调试
+  devtool: 'eval-cheap-module-source-map',
+  // 开发模式，自动更新改动
+  devServer: {
+    static: './dist',
+  },
+})
+</code></pre>
+<p><code>devtool</code> 中的cheap-module“不包含列信息，源码是开发时的代码”;eval&quot;生成代码和Source Map 内容混淆在一起&quot;</p>
+<p><code>mode</code> webpack 环境配置 一般只使用'Development'和'Production'(简称 开发环境 和 生产环境)</p>
+<p><code>devtool</code> 配置 推荐</p>
+<ul>
+<li>开发环境 ： eval-cheap-module-source-map</li>
+<li>生产环境： nosources-source-map 或者 source-map</li>
+</ul>
+<p>使用上述的配置，即可运行项目 <code>webpack-dev-server -config config/webpack.dev.js -open</code></p>
+<p><code>devServer.static</code> 该配置项允许配置从目录提供静态文件的选项（默认是 'public' 文件夹）。将其设置为 <code>false</code> 以禁用。简单的来理解，devServer读取的静态文件都是从当前的./dist文件来读取的</p>
+<h3 id="4-蓝天项目-roadhogrc-迁移至-webpack5-注意事项">4、蓝天项目 roadhogrc 迁移至 webpack5 注意事项</h3>
+<p>以开发环境为例子</p>
+<p><code>webpack.commont.js</code>文件改造成</p>
+<pre><code class="language-javascript">const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const paths = require('./paths');
+
+const lessToJs = require('less-vars-to-js');
+const fs = require('fs');
+const paletteLess = fs.readFileSync(paths.resolveApp('src/styles/variables.less'), 'utf8');
+const lessVars = lessToJs(paletteLess, { resolveVariables: true, stripPrefix: true });
+
+module.exports = {
+  target: ['web', 'es5'],
+  context: paths.appContext,
+  // 入口
+  entry: {
+    index: './src/index.js',
+  },
+  // 输出
+  output: {
+    filename: '[name].js',
+    path: paths.appDist,
+    publicPath: '/',
+    chunkFilename: '[name].chunk.js',
+    // publicPath: paths.appPublic,
+    // 编译前清除目录
+    // clean: true,
+    pathinfo: false
+  },
+  resolve: {
+    extensions: ['.tsx', '.jsx', '.ts', '.js', '.json'],
+    fallback: {
+      fs: false,
+      stream: false,
+      path: false,
+      crypto: false
+    },
+    modules: [
+      paths.appSrc,
+      paths.appNodeModules,
+      paths.appNodeModulesResolveOwn,
+      'node_modules'
+    ],
+    symlinks: false,
+    alias: {
+      Utils: paths.appUtils,
+      '@babel/runtime': '@babel/runtime-corejs2',
+    },
+  },
+  plugins: [
+    // 生成html，自动引入所有bundle
+    new HtmlWebpackPlugin({
+      // favicon: paths.appLogo,
+      title: '蓝天系统',
+      mountRoot: 'root',
+      template: paths.appHtml,
+      filename: 'index.html',
+      inject: 'body',
+      htmlContent: '&lt;%- __html__ %&gt;',
+      initialData: 'window.__INITIAL_STATE__ = &lt;%- __state__ %&gt;',
+      hash: true,    // 为静态资源生成hash值
+      minify: {    // 压缩HTML文件
+        removeComments: false,    // 移除HTML中的注释
+        collapseWhitespace: false,    // 删除空白符与换行符
+      },
+    }),
+    // 进度条
+    new ProgressBarPlugin({
+      format: '  :msg [:bar] :percent (:elapsed s)'
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: paths.appPublic, to: 'public', toType: 'dir' },
+      ]
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.(js|ts|jsx)$/,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        use: [
+          {
+            loader: 'thread-loader',
+            options: {
+              workers: 10
+            }
+          },
+          {
+            loader: 'babel-loader?cacheDirectory',
+          },
+        ]
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/i,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        type: 'asset/resource',
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 1024 * 10,
+            outputPath: 'images'
+          }
+        }
+      },
+      {
+        test: /.(woff|woff2|eot|ttf|otf)$/i,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            }
+          },
+        ],
+      },
+      {
+        test: /\.js\.map$/,
+        use: {
+          loader: 'file-loader'
+        },
+      },
+      {
+        test: /\.less$/,
+        include: /[\\/]node_modules[\\/].*antd/,
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+              lessOptions: {
+                javascriptEnabled: true,
+                math: 'always',
+                modifyVars: { ...lessVars, },
+              }
+            },
+          },
+        ],
+      },
+      {
+        test: /\.less$/,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[name]__[local]'
+              },
+              importLoaders: 2,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              implementation: require.resolve('less'),
+              sourceMap: true,
+              lessOptions: {
+                javascriptEnabled: true,
+                modifyVars: lessVars,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /.(scss|sass)$/,
+        include: paths.appSrc,
+        exclude: paths.appNodeModules,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          'css-loader',
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        exclude: paths.appNodeModules,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[path][name].[ext]',
+              outputPath: 'images/',
+            }
+          }
+        ]
+      },
+      {
+        test: /\.svg$/,
+        include: paths.appSrc,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'images/',
+            }
+          }
+        ],
+        exclude: paths.appNodeModules,
+      },
+      {
+        test: /\.module\.(scss|sass)$/,
+        exclude: paths.appNodeModules,
+        include: paths.appSrc,
+        use: [
+          // 将 JS 字符串生成为 style 节点
+          'style-loader',
+          // 将 CSS 转化成 CommonJS 模块
+          {
+            loader: 'css-loader',
+            options: {
+              // Enable CSS Modules features
+              modules: true,
+              importLoaders: 2,
+              // 0 =&gt; no loaders (default);
+              // 1 =&gt; postcss-loader;
+              // 2 =&gt; postcss-loader, sass-loader
+            },
+          },
+          // 将 PostCSS 编译成 CSS
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    // postcss-preset-env 包含 autoprefixer
+                    'postcss-preset-env',
+                  ],
+                ],
+              },
+            },
+          },
+          // 将 Sass 编译成 CSS
+          'sass-loader',
+        ],
+      },
+
+    ],
+  },
+};
+
+</code></pre>
+<p>新增一个文件paths.js</p>
+<pre><code class="language-javascript">const fs = require('fs')
+const path = require('path')
+
+const appDirectory = process.cwd();
+const resolveApp = relativePath =&gt; path.resolve(appDirectory, relativePath);
+
+function resolveOwn (relative) {
+  return path.resolve(__dirname, '.', relative);
+}
+
+module.exports = {
+  resolveApp,
+  appPublic: resolveApp('public'),
+  appHtml: resolveApp('src/index.html'),
+  appSrc: resolveApp('src'),
+  appDist: resolveApp('dist'),
+  appNodeModules: resolveApp(&quot;node_modules&quot;),
+  appTsConfig: resolveApp('tsconfig.json'),
+  appContext: resolveApp(&quot;./&quot;),
+  appUtils: resolveApp(&quot;src/utils&quot;),
+  appNodeModulesResolveOwn: resolveOwn(&quot;node_modules&quot;),
+  appLogo: resolveApp(&quot;public/fonts/svg/logo.svg&quot;)
+}
+
+</code></pre>
+<p>websocket.dev.js</p>
+<pre><code class="language-javascript">const { merge } = require('webpack-merge');
+const paths = require('./paths');
+const common = require('./webpack.common');
+const TerserPlugin = require('terser-webpack-plugin');
+// const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+
+
+// const smp = new SpeedMeasurePlugin();
+
+module.exports = merge(common, {
+  // 开启缓存
+  cache: {
+    type: 'filesystem'
+  },
+  // 模式
+  mode: 'development',
+  // 开发工具，开启 source map，编译调试
+  devtool: 'eval-cheap-module-source-map',
+  plugins: [
+    // new BundleAnalyzerPlugin()
+  ],
+  // 开发模式，自动更新改动
+  devServer: {
+    port: 3010,
+    historyApiFallback: true, // 设为false会导致手动刷新页面（路由有效）时，报404
+    compress: true, // gzip 压缩
+    hot: 'only', // 启用热模块替换功能，在构建失败时不刷新页面作为回退，使用 hot: 'only'
+    proxy: {
+      '/api': {
+        target: 'https://devnbas.gz4399.com/',
+        changeOrigin: true,
+      }
+    },
+    setupExitSignals: true,  //允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器和退出进程
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        test: /\.(jsx|js)$/,
+        extractComments: true,
+        parallel: true,
+      }),
+    ],
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true,
+          priority: 10,
+        },
+      },
+    },
+  },
+});
+
+</code></pre>
+<p>可能会遇到的问题</p>
+<p>1、<code>ERROR in ./node_modules/dva-core/lib/Plugin.js 13:43-89</code></p>
+<pre><code class="language-cmd">ERROR in ./node_modules/dva-core/lib/Plugin.js 13:43-89
+Module not found: Error: Package path ./core-js/get-iterator is not exported from package /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/@babel/runtime (see exports field in /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/@babel/runtime/package.json)
+ @ ./node_modules/dva-core/lib/index.js 28:38-57
+ @ ./node_modules/dva-core/index.js 1:0-33
+ @ ./node_modules/dva/lib/index.js 96:15-34
+ @ ./node_modules/dva/index.js 5:0-34
+ @ ./src/index.js 13:34-48
+</code></pre>
+<p>解决办法：</p>
+<p>@babel/runtime 使用别的模块(@babel/runtime-corejs2)来 解析</p>
+<p>在webpack的reslove解析函数中找到alias把@babel/runtime 添加进去</p>
+<figure data-type="image" tabindex="3"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214230947328.png" alt="image-20211214230947328" loading="lazy"></figure>
+<p>2、<code>Inline JavaScript is not enabled. Is it set in your options?</code></p>
+<pre><code class="language-cmd"> .bezierEasingMixin();
+^
+Inline JavaScript is not enabled. Is it set in your options?
+
+ Error in /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/antd/es/style/color/bezierEasing.less (line 110, column 0)
+ @ ./node_modules/antd/es/input-number/style/index.less 8:6-188 22:17-24 26:7-21 58:25-39 59:36-47 59:50-64 63:6-73:7 64:54-65 64:68-82 70:42-53 70:56-70 72:21-28 83:0-158 83:0-158 84:22-29 84:33-47 84:50-64 61:4-74:5
+ @ ./node_modules/antd/es/input-number/style/index.js 2:0-22
+ @ ./src/routes/Devops/Log/QueryForm.jsx 99:0-37
+ @ ./src/routes/Devops/index.js 156:13-38
+ @ ./src/routes/BasicLayout.jsx 167:13-31
+ @ ./src/routes/index.js 27:42-66
+ @ ./src/index.js 89:11-41
+
+</code></pre>
+<p>解决方法：通过设置less-loader的options来解决</p>
+<figure data-type="image" tabindex="4"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214232044920.png" alt="image-20211214232044920" loading="lazy"></figure>
+<p>打开注释lessOptions中的 javascriptEnabled:true即可解决 less 行内联样式的问题</p>
+<figure data-type="image" tabindex="5"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214232412124.png" alt="image-20211214232412124" loading="lazy"></figure>
+<p>3、<code>Error evaluating function </code>unit<code>: the first argument to unit must be a number. Have you forgotten parenthesis?</code></p>
+<pre><code class="language-cmd">        &amp;.@{select-tree-prefix-cls}-switcher_open {
+          .antTreeSwitcherIcon();
+        ^
+Error evaluating function `unit`: the first argument to unit must be a number. Have you forgotten parenthesis?
+      Error in /Users/liangpingbo/Desktop/4399/frontend/nbas_frontend/node_modules/antd/es/tree-select/style/index.less (line 93, column 10)
+ @ ./node_modules/antd/es/tree-select/style/index.less 8:6-188 22:17-24 26:7-21 58:25-39 59:36-47 59:50-64 63:6-73:7 64:54-65 64:68-82 70:42-53 70:56-70 72:21-28 83:0-158 83:0-158 84:22-29 84:33-47 84:50-64 61:4-74:5
+ @ ./node_modules/antd/es/tree-select/style/index.js 2:0-22
+ @ ./src/routes/Cmdb/UserAdd.jsx 49:0-36
+ @ ./src/routes/Cmdb/UserList.jsx 45:38-58
+ @ ./src/routes/Cmdb/index.js 113:13-33
+ @ ./src/routes/BasicLayout.jsx 140:13-29
+ @ ./src/routes/index.js 27:42-66
+ @ ./src/index.js 89:11-41
+
+</code></pre>
+<p>Unit 解析失败，unit 用于计算 的, 而目前@select-tree-prefix-cls 是一个变量。</p>
+<p>解决方案：忽略计算先。less-loader.options.lessoptions.math = &quot;always&quot;(扩展 parens | strict 代表所有数学表达式都需要括号)</p>
+<figure data-type="image" tabindex="6"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211214232919137.png" alt="image-20211214232919137" loading="lazy"></figure>
+<p>4、<code>ERROR in ./public/service.png 1:0 Module parse failed: Unexpected character '�' (1:0)</code></p>
+<pre><code class="language-cmd">ERROR in ./public/service.png 1:0
+Module parse failed: Unexpected character '�' (1:0)
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+(Source code omitted for this binary file)
+ @ ./src/routes/components/Support/index.js 79:38-79
+ @ ./src/routes/components/Footer.jsx 19:38-58
+ @ ./src/routes/BasicLayout.jsx 79:37-67
+ @ ./src/routes/index.js 27:42-66
+ @ ./src/index.js 89:11-41
+
+</code></pre>
+<p>问题分析：根据错误提示指出 png文件出现了无法解析的字符�，你可能需要一个解析器来处理</p>
+<p>解决思路：通过添加file-loader解析来处理png, jpg, gif等文件</p>
+<figure data-type="image" tabindex="7"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211215093049945.png" alt="image-20211215093049945" loading="lazy"></figure>
+<p>5、<code>ERROR in ./public/fonts/svg/箭头.svg 1:0 Module parse failed: Unexpected token (1:0) You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file.</code></p>
+<p>ERROR in ./public/fonts/svg/箭头.svg 1:0<br>
+Module parse failed: Unexpected token (1:0)<br>
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders</p>
+<blockquote>
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1598581595686" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3474" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><defs><style type="text/css"></style></defs><path d="M356.4 958.5c-6.4 0-12.8-2.4-17.7-7.3-9.8-9.8-9.8-25.6 0-35.4l403.7-403.7-403.7-403.6c-9.8-9.8-9.8-25.6 0-35.4 9.8-9.8 25.6-9.8 35.4 0l421.3 421.3c9.8 9.8 9.8 25.6 0 35.4L374.1 951.2c-4.9 4.9-11.3 7.3-17.7 7.3z" p-id="3475"></path></svg>
+<p>@ ./src/routes/DataBase/Examine/Query/CreateRightCardAce.jsx 87:33-92<br>
+@ ./src/routes/DataBase/Examine/Query/CreateRightCard.jsx 41:49-80<br>
+@ ./src/routes/DataBase/Examine/Query/Create.jsx 55:46-74<br>
+@ ./src/routes/DataBase/Examine/index.jsx 108:13-37 90:13-37<br>
+@ ./src/routes/DataBase/index.js 128:13-32<br>
+@ ./src/routes/BasicLayout.jsx 164:13-33<br>
+@ ./src/routes/index.js 27:42-66<br>
+@ ./src/index.js 89:11-41</p>
+</blockquote>
+<p>问题分析：根据错误路径分析 错误都是出现在 jsx或者js文件中，而解析js 或者 jsx时都会使用babel-loader。而定义babel-loader解析器都是在.babelrc文件中。错误内容是无法解析svg的内容，因此需要一款svg的解析器</p>
+<figure data-type="image" tabindex="8"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211215_1639532502530104000.png" alt="image-20211215094026960" loading="lazy"></figure>
+<p>解决办法： plugins 插件中 安装 inline-react-svg来解决</p>
+<p>6、<code>export 'Route' (imported as 'Route') was not found in '../../components/Route' (module has no exports)</code></p>
+<p>WARNING in ./src/routes/Ywops/Webssh/index.js 59:46-51<br>
+export 'Route' (imported as 'Route') was not found in '../../components/Route' (module has no exports)<br>
+@ ./src/routes/Ywops/index.js 231:13-31<br>
+@ ./src/routes/BasicLayout.jsx 100:13-30<br>
+@ ./src/routes/index.js 7:0-40 31:46-57 41:15-26<br>
+@ ./src/index.js 75:11-41</p>
+<p>问题分析：错误路径发生在.js 文件中，因此看babel-loader的配置；错误内容相对路径导入有问题。</p>
+<p>解决办法：引入@babel/plugin-transform-modules-commonjs 来解决</p>
+<figure data-type="image" tabindex="9"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211215100217041.png" alt="image-20211215100217041" loading="lazy"></figure>
+<p>7、<code>process is not defined  core.js</code></p>
+<p>Core.js 的路径 是 /node_modules/vfile/core.js</p>
+<pre><code class="language-cmd">Uncaught (in promise) ReferenceError: process is not defined
+    at new VFile (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:8073)
+    at VFile (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:8067)
+    at Function.parse (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:7553)
+    at ReactMarkdown (:4010/vendors-node_modules_react-markdown_lib_react-markdown_js.chunk.js:6721)
+    at renderWithHooks (index.js:204994)
+    at mountIndeterminateComponent (index.js:207076)
+    at beginWork (index.js:207681)
+    at performUnitOfWork (index.js:211368)
+    at workLoop (index.js:211408)
+    at renderRoot (index.js:211491)
+</code></pre>
+<p>因此解决办法是：</p>
+<p>单独对core.js的文件更换解析器来解决</p>
+<figure data-type="image" tabindex="10"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/image-20211216101304318.png" alt="image-20211216101304318" loading="lazy"></figure>
+<pre><code class="language-javascript">{
+  test: /node_modules(\/|\\)vfile(\/|\\)core\.js/,
+  use: [{
+    loader: 'imports-loader',
+    options: {
+      type: 'commonjs',
+      imports: ['single process/browser process'],
+    },
+  }],
+},
+</code></pre>
+<h3 id="5-未完待续">5、未完待续</h3>
+<p>以后若遇到其他的问题，我会继续补充上~</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[antV G6可视化的探索]]></title>
+        <id>https://a1733452028.github.io/post/antv-g6-ke-shi-hua-de-tan-suo/</id>
+        <link href="https://a1733452028.github.io/post/antv-g6-ke-shi-hua-de-tan-suo/">
+        </link>
+        <updated>2021-10-19T08:49:14.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="01-摘要">01 摘要</h3>
+<p>图数据库领域时最近几年大数据领域热度颇高的领域，自2013年开始，图数据库的发展就一起绝尘。与传统关系数据库不同，图数据技术主要关注数据间关系查询能力，是表示和查询关联关系的最佳方式。AntV 团队在图数据库领域沉浸多年，因此本文主要结合的AntV的框架在实际项目中的实践阐述图可视化技术在图数据库领域的应用。</p>
+<h3 id="02-背景简介">02 背景简介</h3>
+<p>随着移动互联网的普及及5G时代的到来，数据库的数据量将会越来越多。面对海量数据，尤其是非结构化数据的存储，传统的关系型数据库已经无法满足分析的需求，分布式图数据库能够很清晰地揭示各类复杂关系，尤其是针对错综复杂的业务逻辑，其优势更为明显。</p>
+<h3 id="21-应用场景">2.1 应用场景</h3>
+<p>图数据库的发展和大数据的发展有着密切的联系。大数据之所以受到广泛关注，其本质在于对海量数据的统计、汇总、分析，可以从中发现一些隐含的规律。</p>
+<p>以真实项目(数据库主从拓扑)为例，其主体是数据库实例。数据库实例之间可能存在主从关系，主主关系。通过图数据库展示时，整个数据拓扑关系会一目了然。</p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211022_1634890908562497000.png" alt="image-20211022162147123" loading="lazy"></figure>
+<p>当数据库主从关系过多，靠人工对数据进行一一排列时会容易出现问题，甚至会梳理错误。在很多场景中，相比于数据本身，其实我们更加关注数据背后所表达的一些信息，以及信息之间的关联。图数据库模式能够更加直观，自然的展示这种关联，对于用户来说，和数据的交互方式，使用数据的方式，通过图的方式也要更加直接。</p>
+<p>目前，我们在真实的项目有两个场景使用AntV G6开源可视化引擎进行开发。一是数据库主从关系拓扑，另外一个是机柜分析</p>
+<figure data-type="image" tabindex="2"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211022_1634890194547602000.png" alt="image-20211022160953180" loading="lazy"></figure>
+<p>以数据库主从关系拓扑为例，用户可以通过搜搜索机房或者平台来筛选，不同机房或者不同平台之间存在哪些数据库实例主从关系。也可以通过把鼠标放到数据库实例上查看，当前数据库实例的主机相关信息及实际的基本信息。</p>
+<p>通过机房视角来区分，当前不同机房是有哪些数据实例</p>
+<figure data-type="image" tabindex="3"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211022_1634890945435583000.png" alt="image-20211022162224373" loading="lazy"></figure>
+<p>通过上图，还可以清晰地查看到XXX机房里面的哪个数据库实例和XXX机房里面具体的那个数据库实例是主从关系的。通过箭头也可以清晰的区分出来，主从关系(有箭头则代表从机)，主主关系(双箭头)</p>
+<figure data-type="image" tabindex="4"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211022_1634890285654514000.png" alt="image-20211022161124605" loading="lazy"></figure>
+<p>点击某个具体实例，能查看主机的基本情况，例如 MasterHost ,MasterPort等等信息</p>
+<figure data-type="image" tabindex="5"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634630868834334000.jpeg" alt="下载 (1)" loading="lazy"></figure>
+<p>其中，机柜分析可以对整个机房网络拓扑结构，流量，终端设备等接入进行可视化管理（基于cmdb数据进行绘制）</p>
+<figure data-type="image" tabindex="6"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634633115762388000.png" alt="image-20211019164514386" loading="lazy"></figure>
+<p>通过左键某个交换机即可查看当前机柜的服务器存放的位置和连接状态。</p>
+<figure data-type="image" tabindex="7"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634627767188349000.png" alt="image-20211019151605915" loading="lazy"></figure>
+<figure data-type="image" tabindex="8"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634628129904100000.jpeg" alt="下载" loading="lazy"></figure>
+<p>通过上面的具体实例，是不是顿时对可视化领域感兴趣呢？接下来，就跟着小编的步伐带你了解可视化技术的知识。</p>
+<h3 id="03-问题分析">03 问题分析</h3>
+<p>当在图数据库领域运用可视化技术，通常会遇到两类问题：</p>
+<ul>
+<li><strong>数据建模</strong>：传统的建模方式是通过填写表单来创建点边，这种方案存在的问题是建模效率低以及无法直观地看清楚图模型的关联关系，如何提升建模效率及直观地展示图模型中的关系时我们需要重点解决的问题。</li>
+<li><strong>数据分析</strong>： 图数据库的查询结果默认返回的是点边集合，一般情况下会使用文本或表格的形式展示，这种方式最大的问题是无法洞察数据之间的关系及发现数据中蕴含的特征，如何有效地提升探索分析的效率及发现关联关系数据中蕴含的特征，是图探索分析需要解决的最大问题。</li>
+</ul>
+<h3 id="04-解决方案">04 解决方案</h3>
+<p>针对上述提出的两个问题，得出如下的解决方案：</p>
+<ul>
+<li>可视化建模</li>
+<li>图探索分析</li>
+</ul>
+<h3 id="41-可视化建模">4.1 可视化建模</h3>
+<p>传统的图模型创建的方式是通过填写表单来生成点边，可视化建模有别于传统的方式。通过可视化拖拽的方式来完成点边的创建，可以有效提升建模的效率，并让提高了模型的可读性。可视化建模方案主要包括图模型的创建、管理及交互三个方面。</p>
+<h4 id="411-创建模型">4.1.1 创建模型</h4>
+<p>图模型是由点边组成的，图模型的创建也就是创建具体的点和边。图模型的创建可采用可视化拖拽加表单填充两种交互形态相互结合的方式完成：</p>
+<ul>
+<li>可视化操作提供全局预览、快速创建关联的能力</li>
+<li>表单填充主要关注节点\边的属性信息，降低属性填入操作复杂度</li>
+</ul>
+<figure data-type="image" tabindex="9"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634614404990612000.png" alt="image-20211019113323705" loading="lazy"></figure>
+<h4 id="412-可视化管理">4.1.2 可视化管理</h4>
+<p>创建完模型以后，加载模型后，可以以可视化的形式来展示和管理。可视化管理模型核心是一块画布。画布之上除会提供诸如搜索、放大缩小、全屏等常见交互能力，还须具备通过拖拽进行模型操作的能力。</p>
+<figure data-type="image" tabindex="10"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634614796828126000.png" alt="image-20211019113955720" loading="lazy"></figure>
+<p>用户点击图中节点/边会在右下角浮出一个预览面板，用户可以通过该面板快速预览节点和边详情。同时用户若有编辑面板的需求可以通过此面板的编辑按钮快速进入编辑弹窗。用户还可以通过节点/边的右键菜单，选择点/边的快速删除以及快捷数据导入。</p>
+<figure data-type="image" tabindex="11"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634615047142026000.png" alt="image-20211019114405608" loading="lazy"></figure>
+<h4 id="413-提高模型的可读性">4.1.3 提高模型的可读性</h4>
+<p>模型的可读性无论是对于数据运维同学还是数据开发同学都是至关重要。一个清晰美观模型能够帮助我们快速解读当前模型，是提升效率的前置条件。如何提高模型的可读性呢？我们可以通过模型的设计规范，布局规范，交互规范来解决。</p>
+<h5 id="4131-设计规范">4.1.3.1 设计规范</h5>
+<p>在图数据库领域，不同场景图模型承载的信息有很大差异，所以设计规范主要考虑的是其通用性。主要通过颜色，大小，Label，状态四种元素进行区分；</p>
+<p>针对目前数据库主从关系拓扑图来说，颜色主要倾向于蓝色；大小一般使用30； Label是由服务器(ip)+业务名称+机房来组成的；状态则使用Img的数据库图片。</p>
+<figure data-type="image" tabindex="12"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211022_1634891130416981000.png" alt="image-20211022162529078" loading="lazy"></figure>
+<h5 id="4132-布局规范">4.1.3.2 布局规范</h5>
+<p>模型中点边数量通常会控制在100以内，但是不同场景会有较大的差异。所以在布局层面主要以力导布局为主；也可以根据模型特征选用同心圆布局，网格布局，辐射布局等；由于数据库主从关系拓扑需要以某个机房，某个业务等及某个机房为视角，因此布局使用dagre+Combo的流程图较为合适。</p>
+<figure data-type="image" tabindex="13"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634622840834288000.png" alt="image-20211019135359761" loading="lazy"></figure>
+<h5 id="4133-交互规范">4.1.3.3 交互规范</h5>
+<p>对于可读性而言，用到的点边交互有选中、hover、拖拽、右键；以及放大缩小、适配、布局定位等全局交互能力；通常图中也无法呈现点/边上的所有属性，需要通过增加属性面板/Tooltip的方式来进行属性呈现。</p>
+<figure data-type="image" tabindex="14"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634623314930550000.png" alt="image-20211019140153875" loading="lazy"></figure>
+<h3 id="42-图搜索分析">4.2 图搜索分析</h3>
+<p>图搜索分析，也是从查询开始，但有别于传统数据库管理系统的查询，图探索分析中的查询是用户通过输入一段DSL、选择一个算法模板或路径开始执行查询，得到并将查询结果渲染到画布上后，以后的分析步骤是没有明确目的的，绝大部分时间都是在探索节点之间的关联关系，试图从数据的关系中发现有价值的洞察。</p>
+<p>完整的图搜索分析应用由以下部分组成：</p>
+<ul>
+<li>全局工具栏：用来承载保存/导出/前进后退等全局操作</li>
+<li>查询面板：进行数据的查询，包括点边查询、DSL(Gremlin、Cypher)、算法查询</li>
+<li>渲染区：对数据库查询结果进行查询。同时具备一定的交互性，允许用户查看节点的详细信息，对节点进行二次探索，算法分析等交互操作</li>
+<li>控制面板：针对渲染区中可视化的内容进行全局操作，如切换布局、切换节点样式、全屏、放大/缩小等</li>
+<li>统计面板：展示全局统计信息</li>
+<li>预览面板：呈现节点和边的完整属性信息</li>
+<li>其他：根据数据类型，可支持TimeBar,地图等额外的模块</li>
+</ul>
+<h3 id="43-画布绘制">4.3 画布绘制</h3>
+<p>图的可读性主要可以体现在合适的场景采用合适的布局策略、善于使用图元素的视觉元素表达不同信息和排除图中干扰元素。</p>
+<h4 id="421-合适的场景采用合适的布局策略">4.2.1 合适的场景采用合适的布局策略</h4>
+<p>合适的场景采用合适的布局策略，必要时可以采用多种布局策略结合（子图布局）提升图的可读性。如下图可以描述的是围绕一个叫Peter的人展开的探索，可以清晰得到Peter在一个叫Nashville的地方度过的大学。</p>
+<figure data-type="image" tabindex="15"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634624388222627000.png" alt="image-20211019141947228" loading="lazy"></figure>
+<h4 id="422-善用节点边视觉元素表达不同的信息">4.2.2 善用节点/边视觉元素表达不同的信息</h4>
+<p>善用节点/边视觉元表达不同的信息。</p>
+<figure data-type="image" tabindex="16"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634624590725888000.png" alt="image-20211019142309738" loading="lazy"></figure>
+<figure data-type="image" tabindex="17"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634624612560705000.png" alt="image-20211019142331282" loading="lazy"></figure>
+<h4 id="423-排除图中干扰因素">4.2.3 排除图中干扰因素</h4>
+<p>必要时候可以通过过滤面板、节点显隐、节点折叠、关联高亮、关键路径高亮等手段排除图中干扰因素，使数据更聚集。</p>
+<figure data-type="image" tabindex="18"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634624822340418000.png" alt="image-20211019142701056" loading="lazy"></figure>
+<h3 id="43-交互探索">4.3 交互探索</h3>
+<h4 id="431-下钻式的探索">4.3.1 下钻式的探索</h4>
+<p>下钻式的探索是针对有聚合节点的情况，用户针对聚合节点可以进行展开操作，展开的操作中，如果还存在聚合节点，可以继续展开操作。</p>
+<p>用户选定一个节点，使用双击、右击菜单等形式指定展开一个聚合节点。展开该聚合节点即获取所有被聚类到该聚合节点中的下一层次的节点，将这些节点与当前图上其余部分进行混合，得到的图我们成为混合图。</p>
+<p>展示混合图，由图可视化开源与分析引擎AntV G6完成，主要包括：</p>
+<ul>
+<li>节点和边的绘制：节点和边的样式要符合图可视化视觉规范；</li>
+<li>布局：由于展开聚合节点是当前图的一个增量改变过程，没有被改变的部分应当尽可能被保留在原来的布局位置上，新增的节点需要重新计算布局位置，并使用特殊的标识表明，方便用户快速定位新增内容。</li>
+</ul>
+<h4 id="432-元素信息探索">4.3.2 元素信息探索</h4>
+<p>元素信息探索，主要包括查看节点、边、聚合节点或聚合边的详情信息</p>
+<p>用户点选画布上的节点或边时，被点选的元素将会被高亮，并出现一个元素详情面板，展示该元素的详细信息：</p>
+<ul>
+<li>若被点选的元素是聚合节点/聚合边，详情面板中将展示聚合节点/聚合边中所含有的真实节点；</li>
+<li>若被点选的元素是真实节点/真实边，详情面板中奖展示该节点/边的具体数据属性。</li>
+</ul>
+<h4 id="433-画布探索">4.3.3 画布探索</h4>
+<p>画布探索，主要通过画布上的ToolBar来实现的，我们可以对画布进行缩放、可以使用拉缩选择多个元素、也可以使用鱼眼放大镜等。</p>
+<p>对画布的探索，可能的操作如下：</p>
+<ul>
+<li>用户可以切换不同的工具对画布进行探索，例如放大、缩小画布；</li>
+<li>使用拉缩进行多个元素的圈选；</li>
+<li>使用鱼眼放大镜探索图上元素密集的部分；</li>
+<li>对图上节点/边进行筛选；</li>
+</ul>
+<h3 id="05-未来展望">05 未来展望</h3>
+<p>AntV G6 引擎如此强大，能应用的场景还远远未挖掘完全。我们将会使用AntV G6针对云安全进行可视化处理。安全可视化是一个交叉研究领域，通过提供交互式可视化工具，提升安全分析人员感知、分析和理解网络安全问题的能力。</p>
+<figure data-type="image" tabindex="19"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634626487369681000.png" alt="image-20211019145446067" loading="lazy"></figure>
+<p>针对服务器上存在的日志，以及后端数据之后，最终呈现出来的效果如下：</p>
+<figure data-type="image" tabindex="20"><img src="https://cdn.jsdelivr.net/gh/a1733452028/blog@main/20211019_1634626538738848000.png" alt="image-20211019145537583" loading="lazy"></figure>
+<h3 id="后记">后记</h3>
+<p>小编在AntV G6的应用上，还有很长的路需要走。希望下次和大家再次见面时能够带来不一样的G6 视觉盛宴，未完待续。。。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[问题联想功能的进阶实现]]></title>
+        <id>https://a1733452028.github.io/post/wen-ti-lian-xiang-gong-neng-de-jin-jie-shi-xian/</id>
+        <link href="https://a1733452028.github.io/post/wen-ti-lian-xiang-gong-neng-de-jin-jie-shi-xian/">
+        </link>
+        <updated>2021-10-09T06:36:45.000Z</updated>
+        <content type="html"><![CDATA[<p>简单的问题联想可以通过mysql的rlike like 或者elasticsearch进行搜索<br>
+这里我要讲述另一个不同的方式来实现(通过前缀树来实现)</p>
+<pre><code class="language-python">class Trie:
+	def __init__(self):
+		self.lookup={} #字典树的每个节点是一个dict dict的key是字符 dict的val是一个全新的dict
+	def insert(self,word):
+		tree=self.lookup
+		for i in word:
+			if i not in tree:
+				tree[i]={}
+			tree=tree[i]
+		tree[&quot;$&quot;]=None #单词的结束标志 val什么值都可以 关键search/startsWith关注的是&quot;$&quot;这个key
+	def search(self,word,flag=False):
+		tree=self.lookup
+		for i in word:
+			if not i in tree:
+				return False
+			tree=tree[i]
+		if flag or &quot;$&quot; in tree:
+			return True
+		return False
+	def startsWith(self,prefix):
+		return self.search(prefix,True) #鉴于startsWith和search的高度相似性 所以直接调search
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[有序列表的插入你真的懂了吗？]]></title>
+        <id>https://a1733452028.github.io/post/you-xu-lie-biao-de-cha-ru-ni-zhen-de-dong-liao-ma/</id>
+        <link href="https://a1733452028.github.io/post/you-xu-lie-biao-de-cha-ru-ni-zhen-de-dong-liao-ma/">
+        </link>
+        <updated>2021-10-09T06:33:55.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="bisect">bisect</h1>
+<p>在python标准库有个bisect模块是内置模块，实现了一个算法用于插入元素到有序列表中。在某一些情况下，这比反复排序列表或者构造一个大的列表在排序的效率更高.</p>
+<pre><code class="language-python">import bisect
+
+L = [1,3,3,6,8,12,15]
+x = 3
+
+x_insert_point = bisect.bisect_left(L, x)
+# 在 L 中查找 x，x 存在时返回 x 左侧的位置，x 不存在返回应该插入的位置
+# 这是3存在于列表中，返回左侧位置１
+print(x_insert_point)
+
+x_insert_point = bisect.bisect_right(L, x)
+# 在 L 中查找 x，x 存在时返回x右侧的位置，x 不存在返回应该插入的位置
+# 这是3存在于列表中，返回右侧位置３
+print(x_insert_point)
+
+x_insort_left = bisect.insort_left(L, x)
+#将 x 插入到列表 L 中，x 存在时插入在左侧
+print(L)
+
+x_insort_rigth = bisect.insort_right(L, x)
+#将 x 插入到列表L中，x 存在时插入在右侧
+print(L)
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[文件 X模式你懂了吗？]]></title>
+        <id>https://a1733452028.github.io/post/wen-jian-x-mo-shi-ni-dong-liao-ma/</id>
+        <link href="https://a1733452028.github.io/post/wen-jian-x-mo-shi-ni-dong-liao-ma/">
+        </link>
+        <updated>2021-10-09T06:30:57.000Z</updated>
+        <content type="html"><![CDATA[<p>假如有一个需求：写一个文件，如果该文件已经存在，则不写。实现方式也很简单，我们先判断一下文件是否存在，如果已经存在，则打印提示信息并跳过，否则，我们就用w模式打开文件<br>
+常规的写法：</p>
+<pre><code class="language-python">import os
+if not os.path.exists('somefile'):
+    with open('somefile', 'wt') as f:
+        f.write('Hello\n')
+else:
+    print 'File alreay exists!'
+</code></pre>
+<p>简洁的写法：直接使用x模式来判断就可了</p>
+<pre><code class="language-python">with open('somefile', 'xt') as f:
+    f.write('Hello\n')
+</code></pre>
+]]></content>
+    </entry>
+</feed>
